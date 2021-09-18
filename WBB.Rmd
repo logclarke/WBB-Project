@@ -6,7 +6,7 @@ output: html_document
 ---
 
 Read in packages
-```{r}
+```{r, include=FALSE}
 library(rvest)
 library(tidyverse)
 library(stringr)

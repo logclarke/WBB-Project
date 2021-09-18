@@ -1,0 +1,59 @@
+---
+title: "ModelTest"
+author: "Chris Harden"
+date: "9/17/2021"
+output: html_document
+---
+
+
+Read in packages
+```{r, include=FALSE}
+library(rvest)
+library(tidyverse)
+library(stringr)
+```
+
+
+```{r}
+schedule_url <- read_html("https://www.espn.com/womens-college-basketball/team/schedule/_/id/252/season/2021")
+
+wbb_schedule <- schedule_url %>%  html_elements("id") %>% html_table(fill = TRUE)
+
+game_ids <- schedule_url %>% str_extract_all('(?<=gameId/)(.*?)(?=")') %>% unlist() %>% unique()
+
+box_score_url <- read_html("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/401311243")
+
+team_order <- box_score_url %>% html_elements(xpath = "//div[@class='team-name']") %>% html_text()
+wbb_box <- box_score_url %>% html_elements(xpath = "//table[@data-behavior]") %>% html_table()
+byu_box <- wbb_box[[which(team_order == "BYU")]]
+
+#get them all read in.
+all_box_scores <- function(game){
+  
+  box_score_url_game <- read_html(paste0("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/", game))
+  
+  team_order <- box_score_url_game %>% html_elements(xpath = "//div[@class='team-name']") %>% html_text()
+  wbb_box <- box_score_url_game %>% html_elements(xpath = "//table[@data-behavior]") %>% html_table()
+  if (length(which(team_order == "BYU")) > 0) {
+    byu_box <- wbb_box[[which(team_order == "BYU")]]
+  } else {
+    byu_box <- data.frame(NULL)
+  }
+}
+
+box_list <- lapply(game_ids, all_box_scores)
+```
+
+
+```{r}
+# box_df <- data.frame(Reduce(rbind, box_list))
+# 
+# box_df_players <- box_df %>% 
+#   filter(Starters != "No" & Starters != "Bench" & Starters != "TEAM" & Starters != "") %>% 
+#   arrange(Starters)
+# 
+# box_df_games <- box_df %>% 
+#   filter(Starters != "No" & Starters != "Bench" & Starters != "TEAM" & Starters != "")
+
+```
+
