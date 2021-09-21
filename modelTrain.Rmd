@@ -8,18 +8,17 @@ output: html_document
 We will train the data using 2020-2021 data since we have a ranking from the coaches that we can match against. 
 
 ```{r, include=FALSE}
+rm(list = ls())
 library(rvest)
 library(tidyverse)
 library(stringr)
 ```
 
 
-```{r}
+```{r warning=FALSE}
 schedule_url <- read_html("https://www.espn.com/womens-college-basketball/team/schedule/_/id/252/season/2021")
 
-wbb_schedule <- schedule_url %>%  html_elements("id") %>% html_table(fill = TRUE)
-
-game_ids <- schedule_url %>% str_extract_all('(?<=gameId/)(.*?)(?=")') %>% unlist() %>% unique()
+game_ids <- schedule_url %>% html_elements(xpath = "//a[@href]") %>% str_extract_all('(?<=gameId/)(.*?)(?=")') %>% unlist() %>% unique()
 
 box_score_url <- read_html("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/401311243")
 
