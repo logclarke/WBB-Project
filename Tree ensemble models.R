@@ -1,48 +1,22 @@
 
 
-box <- read.csv("bpmCalculation.csv")
+box <- read.csv("CompiledBox.csv")
 
 hist(box$BPM)
 hist(as.numeric(box$FT.))
 
-# Get rid of the big outlier
+# Get rid of the big outliers
 plot(box$BPM)
 box <- box[-1,]
 box <- box[!is.na(box$X2P.),]
+box <- box[box$BPM > -10,]
+
+hist(box$BPM)
 
 
 
-(apply(box, 2, is.na))
 
-# single tree
-# Not sure why it's not working
-
-set.seed(2345)
-samp <- sample(1:102, 90)
-train <- rivers[samp,]
-test <- rivers[-samp,]
-library(rpart)
-library(rpart.plot)
-box$ï..Name
-library(rpart)
-library(rpart.plot)
-colnames(box)
-
-tree <- rpart(BPM~ FG  + FG + FGA + FG. + X3P + X3PA + X2P + X2PA + X2P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-              data=box,  control=list(cp=0))
-
-
-summary(tree)
-rpart.plot(tree)
-plotcp(tree)
-min.cp <- tree$cptable[which.min(tree$cptable[,'xerror']),'CP']
-tree.pruned <- prune(tree, cp=min.cp)
-rpart.plot(tree.pruned)
-yhat.tree = predict(tree.pruned, newdata=)
-mean((yhat.tree - box$BPM)^2)
-summary(tree)
-
-
+sd(box$BPM)
 
 # Bagging
 library(ranger)
@@ -50,7 +24,6 @@ library(ranger)
 bag <- ranger(BPM~ FG  + FG + FGA + X3P + X3PA + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
               data=box, num.trees = 100, mtry = 14, importance = "permutation") 
 summary(bag)
-bag$predictions
 
 sqrt(bag$prediction.error)
 
@@ -61,9 +34,9 @@ vip(bag)
 # Random Forest model
 
 bag <- ranger(BPM~  FG + FGA + X3P + X3PA + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-              data=box, num.trees = 100, mtry = 4, importance = "permutation") 
+              data=box, num.trees = 1000, mtry = 4, importance = "permutation") 
 
-sqrt(rf$prediction.error)
+sqrt(bag$prediction.error)
 
 vip(rf)
 
@@ -98,7 +71,6 @@ print(best.iter)
 
 
 ### Identify test sets
-# What if i use it to rank instead??
 library(magrittr)
 K = 5
 possibilities = 1:nrow(box)
@@ -118,7 +90,6 @@ SSE <-SumE <- 0
 oob.mse.gbm <- NA
 boost.rsq <- NA
 
-BPM~ FG  + FG + FGA + X3P + X3PA + X2P + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS
 
 for(i in 1:5){
   train.data = box[-splits[[i]],]
@@ -141,22 +112,10 @@ plot(p, test.data$BPM)
 
 sqrt(mean(oob.mse.gbm))
 mse = (SSE/nrow(box))
+sqrt(mse)
 bias = SumE/nrow(box)
 rsq = 1- SSE/(sum((box$BPM - mean(box$BPM))^2))
 
-
-
-
-
-
-library(gbm)
-gbm_best <- gbm(BPM~ FG  + FG + FGA + FG. + X3P + X3PA + X2P + X2PA + X2P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-                data=box, distribution = "gaussian", n.trees = 549, interaction.depth = 3, shrinkage = 0.01, train.fraction = .5) 
-
-which.min(gbm_best$valid.error)
-
-gbm_best <- gbm(BPM~ FG  + FGA + FG. + X3P + X3PA + X2P + X2PA + X2P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-                data=box, distribution = "gaussian", n.trees = 549, interaction.depth = 3, shrinkage = 0.01) 
 
 
 
@@ -164,13 +123,11 @@ gbm_best <- gbm(BPM~ FG  + FGA + FG. + X3P + X3PA + X2P + X2PA + X2P. + FT + FTA
 ## BART
 ####
 
-
-library(BART) #we'll use gbart or wbart functions. (I'm pretty sure gbart just uses wbart when you put in a continuous outcome)
+library(BART)
 library(magrittr)
 
 n.trees <- seq(20, 300, length.out = 5)
 oob.mse <- NA
-bart.rsq <- NA
 #120 trees i think is my best
 for(i in 1:5){
   
@@ -182,13 +139,11 @@ for(i in 1:5){
                ntree = 30, ndpost=1200, nskip = 300, sparse = TRUE)
   
   oob.mse[i] <- (bart$yhat.test.mean - test$BPM)^2 %>% mean()
-  bart.rsq[i] <- 1-(sum((bart$yhat.train.mean - train$BPM)^2)/sum((train$BPM - mean(train$BPM))^2))
-  
+
   
 }
 
 sqrt(mean(oob.mse))
-mean(bart.rsq)
 
 
 bart.vip <- as.data.frame(sort(bart$varcount.mean, decreasing = TRUE))  
@@ -282,4 +237,212 @@ lm_box <- lm(BPM~ FG  + FG + FGA + X3P + X3PA + X2P + X2PA  + FT + FTA + ORB + D
 
 summary(lm_box)
 p = predict.lm(lm_box, newdata = test.data)
-  
+
+
+
+# Couldn't get neural net package to work, I will try again with tensorflow
+# ## Try a neural net
+# 
+# library(neuralnet)
+# 
+# relu = function(x) {ifelse(x<0,0*x,x)}
+# relu_diff <- function(x) {x/(1+exp(-2*10*x))}
+# 
+# range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+# box$BPM = range01(box$BPM)
+# box$PTS = range01(box$PTS)
+# box$AST = range01(box$AST)
+# box$FGA = range01(box$FGA)
+# box$FG = range01(box$FG)
+# box$FG. = range01(box$FG.)
+# box$X3P = range01(box$X3P)
+# box$X3PA = range01(box$X3PA)
+# box$FG = range01(box$FG)
+# 
+# 
+# nn=neuralnet(BPM~PTS + FG + AST,
+#              data=box, hidden=c(4),act.fct = relu_diff)
+# 
+# 
+# rmse_1 <- NA
+# bias_1 <- NA
+# rsq_1 <- NA
+# SSE <- 0
+# for(nodes3 in 1:10){
+#   SSE <- SumE <- 0
+#   for(i in 1:K){
+#     train.data = box[-splits[[i]],]
+#     test.data = box[splits[[i]], ]
+#     
+#     nn=neuralnet(BPM ~ PTS + FG + X3P,data=train.data, hidden=c(nodes3), act.fct = relu_diff)
+#     p = predict(nn,newdata = test.data)*30
+#     
+#     SSE = SSE + sum((p - test.data$BPM)^2)
+#     SumE = SumE + sum(p - test.data$BPM)
+#     
+#   }
+#   
+#   rmse_1[nodes3] = sqrt(SSE/nrow(box))
+#   bias_1[nodes3] = SumE/nrow(box)
+#   rsq_1[nodes3] = 1- SSE/(sum((box$swc - mean(box$swc))^2))
+#   
+# }
+# 
+# rmse_1
+# 
+# 
+# 
+# # fit neural network - note activation function must be differentiable for this function. 
+# library(neuralnet)
+# with(ag,scatter.smooth(cwsi,swc,pch=19))
+# nn=neuralnet(I(swc/30)~cwsi ,data=ag, hidden=2,act.fct = relu_diff)
+# 
+# oos = data.frame(cwsi = seq(0,1,length.out=1000))
+# p = predict(nn,newdata = oos)
+# lines(oos$cwsi,p*30,col=2)
+# # Will need to tweak the hidden layers, which is perhaps more art than science (and more cross-validation than anything else ;)
+# 
+# 
+# 
+# 
+# 
+# ####
+# # My code
+# 
+# ag <- read.table(file = "agwater.txt", header = TRUE)
+# with(ag,scatter.smooth(cwsi,swc,pch=19))
+# 
+# ### Identify test sets
+# K = 5
+# possibilities = 1:nrow(ag)
+# this.many = round(nrow(ag)/K)
+# 
+# splits <- list()
+# already.used <- NA
+# for(i in 2:K){
+#   samp <- sample(possibilities, this.many, replace = FALSE)
+#   splits[[i]] <- samp
+#   possibilities = possibilities[!(possibilities %in% splits[[i]]) ]
+# }
+# splits[[1]] = possibilities
+# 
+# 
+# ### Cross validate
+# library(neuralnet)
+# relu = function(x) {ifelse(x<0,0*x,x)}
+# relu_diff <- function(x) {x/(1+exp(-2*10*x))}
+# 
+# 
+# SSE <- 0
+# SumE <- 0
+# K 
+# 
+# nn=neuralnet(I(swc/30) ~  ,data=train.data, hidden=c(nodes, nodes2), act.fct = relu_diff)
+# 
+# 
+# rmse <- matrix(nrow = 5, ncol = 5)
+# bias <- matrix(nrow = 5, ncol = 5)
+# rsq <- matrix(nrow = 5, ncol = 5)
+# 
+# 
+# 
+# for(nodes in 1:5){
+#   for(nodes2 in 1:5){
+#     SSE <- SumE <- 0
+#     for(i in 1:K){
+#       train.data = ag[-splits[[i]],]
+#       test.data = ag[splits[[i]], ]
+#       
+#       nn=neuralnet(I(swc/30) ~ cwsi ,data=train.data, hidden=c(nodes, nodes2), act.fct = relu_diff)
+#       p = predict(nn,newdata = test.data)*30
+#       
+#       SSE = SSE + sum((p - test.data$swc)^2)
+#       SumE = SumE + sum(p - test.data$swc)
+#       
+#     }
+#     
+#     rmse[nodes, nodes2] = sqrt(SSE/nrow(ag))
+#     bias[nodes, nodes2] = SumE/nrow(ag)
+#     rsq[nodes, nodes2] = 1- SSE/(sum((ag$swc - mean(ag$swc))^2))
+#     
+#   }
+#   
+# }
+# 
+# rmse
+# 
+# min(rmse, na.rm = TRUE)
+# bias
+# rsq
+# 
+# set.seed(1234)
+# rmse_1 <- NA
+# bias_1 <- NA
+# rsq_1 <- NA
+# 
+# for(nodes3 in 1:10){
+#   SSE <- SumE <- 0
+#   for(i in 1:K){
+#     train.data = ag[-splits[[i]],]
+#     test.data = ag[splits[[i]], ]
+#     
+#     nn=neuralnet(I(swc/30) ~ cwsi ,data=train.data, hidden=c(4, 4, nodes3), act.fct = relu_diff, threshold = 0.001)
+#     p = predict(nn,newdata = test.data)*30
+#     
+#     SSE = SSE + sum((p - test.data$swc)^2)
+#     SumE = SumE + sum(p - test.data$swc)
+#     
+#   }
+#   
+#   rmse_1[nodes3] = sqrt(SSE/nrow(ag))
+#   bias_1[nodes3] = SumE/nrow(ag)
+#   rsq_1[nodes3] = 1- SSE/(sum((ag$swc - mean(ag$swc))^2))
+#   
+# }
+# 
+# rmse_1
+# bias_1
+# rsq_1
+# 
+# SSE <- SumE <- 0
+# 
+# nn=neuralnet(I(swc/30) ~ cwsi ,data=train.data, hidden=c(4, 4, 4), act.fct = relu_diff)
+# p = predict(nn,newdata = test.data)*30
+# 
+# SSE = SSE + sum((p - test.data$swc)^2)
+# SumE = SumE + sum(p - test.data$swc)
+# 
+# 
+# set.seed(1234)
+# SSE <- SumE <- 0
+# 
+# for(i in 1:K){
+#   train.data = ag[-splits[[i]],]
+#   test.data = ag[splits[[i]], ]
+#   
+#   nn=neuralnet(I(swc/30) ~ cwsi ,data=train.data, hidden=c(4, 4, 4), act.fct = relu_diff, threshold = 0.001)
+#   p = predict(nn,newdata = test.data)*30
+#   
+#   SSE = SSE + sum((p - test.data$swc)^2)
+#   SumE = SumE + sum(p - test.data$swc)
+#   
+# }
+# 
+# rmse <- sqrt(SSE/nrow(ag))
+# rmse
+# 
+# 
+# SSE <- SumE <- 0
+# 
+# for(i in 1:K){
+#   train.data = ag[-splits[[i]],]
+#   test.data = ag[splits[[i]], ]
+#   
+#   nn=neuralnet(I(swc/30) ~ cwsi ,data=train.data, hidden=c(4, 4, 4), act.fct = relu_diff)
+#   p = predict(nn,newdata = test.data)*30
+#   
+#   SSE = SSE + sum((p - test.data$swc)^2)
+#   SumE = SumE + sum(p - test.data$swc)
+#   
+# }
+# 
