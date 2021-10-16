@@ -7,9 +7,21 @@ hist(as.numeric(box$FT.))
 
 # Get rid of the big outliers
 plot(box$BPM)
+box$X2P. <- as.numeric(box$X2P.)
+box$FT. <- as.numeric(box$FT.)
+box$X3P. <- as.numeric(box$X3P.)
+box$FG. <- as.numeric(box$FG.)
+
+
 box <- box[-1,]
 box <- box[!is.na(box$X2P.),]
-box <- box[box$BPM > -10,]
+box <- box[!is.na(box$FT.),]
+box <- box[!is.na(box$X3P.),]
+
+
+box <- box[box$BPM > -15,]
+
+hist(box$BPM)
 
 hist(box$BPM)
 
@@ -21,8 +33,8 @@ sd(box$BPM)
 # Bagging
 library(ranger)
 
-bag <- ranger(BPM~ FG  + FG + FGA + X3P + X3PA + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-              data=box, num.trees = 100, mtry = 14, importance = "permutation") 
+bag <- ranger(BPM~ FG  + FG + FGA + X3P + X3PA + X2P. + X2PA + FG. + FT. + X3P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
+              data=box, num.trees = 1000, mtry = 14, importance = "permutation") 
 summary(bag)
 
 sqrt(bag$prediction.error)
@@ -50,7 +62,7 @@ library(ellipsis)
 
 ### Boosting
 library(gbm)
-gbm1 <- gbm(BPM~ FG  + FG + FGA + X3P + X3PA + X2P + X2PA +X2P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
+gbm1 <- gbm(BPM~ FG  + FG + FGA + X3P + X3PA + X2P. + X2PA + FG. + FT. + X3P. + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
             data = box, 
             distribution = "gaussian", n.trees = 2000, interaction.depth = 3, shrinkage = 0.01, train.fraction = 0.8, 
             cv.folds = 10)  
@@ -90,13 +102,14 @@ SSE <-SumE <- 0
 oob.mse.gbm <- NA
 boost.rsq <- NA
 
-
+#Gradient Boosting Model
 for(i in 1:5){
   train.data = box[-splits[[i]],]
   test.data = box[splits[[i]], ]
   
-  gbm1 <- gbm(BPM~ FG  + FGA + X3P + X3PA + X2P + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS,
-              data=train.data, distribution = "gaussian", n.trees = 1010, interaction.depth = 3, shrinkage = 0.01)  
+  gbm1 <- gbm(BPM~ FG  + FGA + X3P + X3PA + X2P + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS + FG. + 
+                X3P.,
+              data=train.data, distribution = "gaussian", n.trees = 3000, interaction.depth = 10, shrinkage = 0.01)  
   p = predict(gbm1, newdata = test.data)
   
   oob.mse.gbm[i] <- (p- test.data$BPM)^2 %>% mean()
@@ -107,7 +120,7 @@ for(i in 1:5){
 
 
 
-plot(p, test.data$BPM)
+plot(test.data$BPM, p)
 
 
 sqrt(mean(oob.mse.gbm))
@@ -117,7 +130,7 @@ bias = SumE/nrow(box)
 rsq = 1- SSE/(sum((box$BPM - mean(box$BPM))^2))
 
 
-
+sd(box$BPM)
 
 ####
 ## BART
@@ -133,21 +146,25 @@ for(i in 1:5){
   
   train <- box[-splits[[i]],]
   test <- box[splits[[i]],]
-  bart = gbart(x.train = train[,c(4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 17, 18, 20, 21, 22, 23, 24, 25, 26, 28)],
+  bart = gbart(x.train = train[,c( 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28)],
                y.train = train$BPM, 
-               x.test = test[,c(4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 17, 18, 20, 21, 22, 23, 24, 25, 26, 28)], 
-               ntree = 30, ndpost=1200, nskip = 300, sparse = TRUE)
+               x.test = test[,c( 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28)], 
+               ntree = 120, ndpost=1200, nskip = 300, sparse = FALSE)
   
   oob.mse[i] <- (bart$yhat.test.mean - test$BPM)^2 %>% mean()
 
   
 }
 
+ncol(train[,c( 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28)])
+
 sqrt(mean(oob.mse))
 
+plot(test$BPM, bart$yhat.test.mean)
 
 bart.vip <- as.data.frame(sort(bart$varcount.mean, decreasing = TRUE))  
-bart.vip  
+(bart.vip)
+
 
 
 
