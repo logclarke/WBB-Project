@@ -32,9 +32,12 @@ write.csv(totals, file.path("..", "practiceBYU", "practiceDataClean.csv"), row.n
 
 team <- read.csv(file.path("..", "practiceBYU", "team_info.csv"))
 
-totals <- cbind(team, totals[-length(totals$Name),])
+totals <- cbind(team[,2:length(team)], totals[-length(totals$Name),])
 
-totals <- totals[,c(1:6, 9, 10, 27, 26, 28, 24, 23, 25, 21, 20, 22, 30, 29, 31, 12, 11, 13, 18, 15, 17, 14, 35)]
+totals <- totals[,c("Name", "Age", "Pos", "Ft", "Inches", "Exp", "Games", "Starts", "FGm", 
+                    "FGa", "FGper", "THREEpm", "THREEpa", "THREEper", "TWOpm", "TWOpa", "TWOper", 
+                    "FTm", "FTa", "FTper", "OREB", "DREB", "TREB", "Assists", "Steals", "Blocks", 
+                    "TOV", "Fouls", "Points")]
 
 write.csv(totals, file.path("..", "practiceBYU", "practiceBoxScore.csv"), row.names = FALSE)
 
