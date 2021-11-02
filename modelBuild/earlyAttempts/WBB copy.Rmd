@@ -1,0 +1,72 @@
+---
+title: "WBB"
+author: "Logan Clarke"
+date: "8/30/2021"
+output: html_document
+---
+
+Read in packages
+```{r}
+library(rvest)
+library(tidyverse)
+library(stringr)
+
+```
+
+
+```{r}
+schedule_url <- read_html("https://www.espn.com/womens-college-basketball/team/schedule/_/id/252/season/2021")
+
+wbb_schedule <- schedule_url %>%  html_elements("id") %>% html_table(fill = TRUE)
+
+game_ids <- schedule_url %>% str_extract_all('(?<=gameId/)(.*?)(?=")') %>% unlist() %>% unique()
+
+box_score_url <- read_html("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/401311243")
+
+# wbb_box <- box_score_url %>%  html_nodes("table") %>% html_table(fill = TRUE)
+#gamepackage-boxscore-module :nth-child(1)
+team_order <- box_score_url %>% html_elements(xpath = "//div[@class='team-name']") %>% html_text()
+wbb_box <- box_score_url %>% html_elements(xpath = "//table[@data-behavior]") %>% html_table()
+byu_box <- wbb_box[[which(team_order == "BYU")]]
+
+
+#subset just the table with the byu box score. It's usually the 2nd table but not always. Sometimes it is the 3rd table instead
+# wbb_box <- wbb_box[[2]]
+
+
+
+#get them all read in. This isn't working
+all_box_scores <- function(game){
+  
+  box_score_url_game <- read_html(paste0("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/", game))
+  
+  team_order <- box_score_url_game %>% html_elements(xpath = "//div[@class='team-name']") %>% html_text()
+  wbb_box <- box_score_url_game %>% html_elements(xpath = "//table[@data-behavior]") %>% html_table()
+  if (length(which(team_order == "BYU")) > 0) {
+    byu_box <- wbb_box[[which(team_order == "BYU")]]
+  } else {
+    byu_box <- data.frame(NULL)
+  }
+}
+
+box_list <- lapply(game_ids, all_box_scores)
+
+# for (i in 1:length(game_ids)) {
+#   box_score_url_game <- read_html(paste0("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/", game_ids[i]))
+# 
+#   team_order <- box_score_url_game %>% html_elements(xpath = "//div[@class='team-name']") %>% html_text()
+#   wbb_box <- box_score_url_game %>% html_elements(xpath = "//table[@data-behavior]") %>% html_table()
+#   byu_box <- wbb_box[[which(team_order == "BYU")]]
+#   print(i)
+# }
+
+
+#testing different games to see what order table they're in
+# box_score_url2 <- read_html("https://www.espn.com/womens-college-basketball/boxscore/_/gameId/401254458")
+# 
+# wbb_box2 <- box_score_url2 %>%  html_nodes("table") %>% html_table(fill = TRUE)
+# 
+# (wbb_box2 <- wbb_box2[[2]])
+  
+```
+
