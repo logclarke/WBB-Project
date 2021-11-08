@@ -1,5 +1,6 @@
 library(readxl)
-
+# assertthat::assert_that(getwd()=="~/Desktop/curr_Chris/Sportsdada/WBB-Project/practiceBYU")
+setwd("~/Desktop/curr_Chris/Sportsdada/WBB-Project/practiceBYU")
 totals <- read_xlsx(file.path("..", "practiceBYU", "practiceDataRaw.xlsx"), 
                     sheet = "TOTALS & AVERAGES")
 
@@ -38,6 +39,8 @@ totals <- totals[,c("Name", "Age", "Pos", "Ft", "Inches", "Exp", "Games", "Start
                     "FGa", "FGper", "THREEpm", "THREEpa", "THREEper", "TWOpm", "TWOpa", "TWOper", 
                     "FTm", "FTa", "FTper", "OREB", "DREB", "TREB", "Assists", "Steals", "Blocks", 
                     "TOV", "Fouls", "Points")]
+
+# totals <- totals[-13, ]
 
 write.csv(totals, file.path("..", "practiceBYU", "practiceBoxScore.csv"), row.names = FALSE)
 
