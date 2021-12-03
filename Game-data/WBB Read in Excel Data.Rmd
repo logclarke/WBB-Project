@@ -1,0 +1,68 @@
+---
+title: "WBB Read in Excel Data"
+author: "Logan Clarke"
+date: "12/1/2021"
+output: html_document
+---
+
+```{r}
+library(readxl) 
+library(plyr)
+library(tibble)
+
+data_ref <- "/Users/loganclarke/Downloads/WBBGame stats.xlsx"
+
+excel_sheets(path = data_ref)
+
+#extract only the week total tabs
+clean_tabs <- grep("*Total", excel_sheets(path = data_ref), value = TRUE)
+
+last_tab <- tail(clean_tabs, n = 1)
+
+latest_week <- read_excel(path = data_ref, sheet = last_tab)
+
+#create clean dataset in the right order
+clean_week <- function(week){
+  week <- data.frame(week)
+  week1 <- week[c(2, 3, 6, 8, 9, 11, 13:16, 18, 19, 21, 23, 24, 26:28, 30:32, 34, 36)]
+  week2 <- week1[c(1, 2, 12, 11, 13, 18, 17, 19, 15, 14, 16, 21, 20, 22, 9, 10, 8, 4, 6, 7, 5, 23, 3)]
+  write_csv(week2, "week_3_game_data.csv")
+}
+
+clean_week(latest_week)
+
+
+```
+
+
+
+Appendix
+```{r}
+#use this if reading in a bunch of tabs
+#list_all <- lapply(clean_tabs, function(x) read_excel(path = data_ref, sheet = x))
+
+#this was the way to create dynamic variable names. Just couldn'f figure out how to store them as a list
+# week <- 0
+# 
+# week[[i]] <- week1 <- data.frame(list_all[[i]])
+# 
+# assign(paste0("week", 1), list_all[[1]])
+# 
+# week11
+# 
+# for(i in 1:length(list_all)) {
+#   assign(paste0("week_", i), list_all[[i]])
+#   
+# }
+
+```
+
+
+
+
+
+
+
+
+
+
