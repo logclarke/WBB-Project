@@ -10,7 +10,7 @@ library(readxl)
 library(plyr)
 library(tibble)
 
-data_ref <- "/Users/loganclarke/Downloads/WBBGame stats.xlsx"
+data_ref <- "/Users/loganclarke/Documents/WBB Project/WBBGame stats.xlsx"
 
 excel_sheets(path = data_ref)
 
@@ -26,7 +26,7 @@ clean_week <- function(week){
   week <- data.frame(week)
   week1 <- week[c(2, 3, 6, 8, 9, 11, 13:16, 18, 19, 21, 23, 24, 26:28, 30:32, 34, 36)]
   week2 <- week1[c(1, 2, 12, 11, 13, 18, 17, 19, 15, 14, 16, 21, 20, 22, 9, 10, 8, 4, 6, 7, 5, 23, 3)]
-  write_csv(week2, "week_5_game_data.csv")
+  write_csv(week2, "week_6_game_data.csv")
 }
 
 clean_week(latest_week)
@@ -37,7 +37,7 @@ clean_week(latest_week)
 
 Creating csv files for the cumulative total
 ```{r}
-data_ref <- "/Users/loganclarke/Downloads/WBBGame stats.xlsx"
+data_ref <- "/Users/loganclarke/Documents/WBB Project/WBBGame stats.xlsx"
 
 excel_sheets(path = data_ref)
 
@@ -51,7 +51,7 @@ clean_week <- function(week){
   week <- data.frame(week)
   week1 <- week[c(2, 3, 6, 8, 9, 11, 13:16, 18, 19, 21, 23, 24, 26:28, 30:32, 34, 36)]
   week2 <- week1[c(1, 2, 12, 11, 13, 18, 17, 19, 15, 14, 16, 21, 20, 22, 9, 10, 8, 4, 6, 7, 5, 23, 3)]
-  write_csv(week2, "cum_total_11_dec.csv")
+  write_csv(week2, "cum_total_21_dec.csv")
 }
 
 clean_week(cum_clean)
