@@ -1,10 +1,10 @@
 library(dplyr)
 practice <- read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/practiceBYU/practiceDataClean.csv")
 colnames(practice)
-practice <- practice[1:18,]
+practice <- practice[1:16,]
 
 names(practice) <- c("No.", "Name", "Games", "Starts", "Fouls", "DRB", "ORB", "TRB", "TOV", "STL", "TOVminSTL", "BLK", "AST", "Charges",  "X2PA", "X2P", "X2P.", 
-                     "X3PA", "X3P", "X3P.", "FGA", "FG", "FG.", "FTA", "FT", "FT.", "Tota", "Totm", "TOTper", "PTS")
+                     "X3PA", "X3P", "X3P.", "FGA", "FG", "FG.", "FTA", "FT", "FT.", "TOTa", "TOTm", "TOTper", "PTS")
 
 # length(colnames(practice[,c(6:10,12:13,15:26,30)]))
 # length(colnames(box[,c(7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28)]))
@@ -18,7 +18,7 @@ names(practice) <- c("No.", "Name", "Games", "Starts", "Fouls", "DRB", "ORB", "T
 # df_bart = df_bart %>% arrange(-Prediction)
 # bart$varcount.mean
 
-box <- read.csv("CompiledBox.csv")
+box <- read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/modelBuild/CompiledBox.csv")
 
 hist(box$BPM)
 hist(as.numeric(box$FT.))
@@ -48,7 +48,8 @@ gbm1 <- gbm(BPM~ FG  + FGA + X3P + X3PA + X2P + X2P. + X2PA  + FT + FTA + ORB + 
             data=box, distribution = "gaussian", n.trees = 3000, interaction.depth = 10, shrinkage = 0.01)  
 p = predict(gbm1, newdata = practice)
 df <- data.frame("Name" = practice$Name, "BPM_Pred" = p)
-knitr::kable(df %>% arrange(-BPM_Pred))
+knitr::kable(df %>% arrange(-BPM_Pred), caption = "Practice Rankings")
+
 
 df %>% arrange(-BPM_Pred)
 library(vip)
@@ -57,4 +58,3 @@ vip(gbm1)
 knitr::kable(df_bart)
 
 practice %>% filter
-
