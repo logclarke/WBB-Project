@@ -1,7 +1,7 @@
 library(gbm)
 library(dplyr)
 
-box <- read.csv("CompiledBox.csv")
+box <- read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/modelBuild/CompiledBox.csv")
 
 hist(box$BPM)
 hist(as.numeric(box$FT.))
@@ -24,8 +24,8 @@ box <- box[!is.na(box$X3P.),]
 box <- box[box$BPM > -15,]
 
 gbm_1 <- gbm(BPM~ FG  + FGA + X3P + X3PA + X2P + X2P. + X2PA  + FT + FTA + ORB + DRB + TRB + AST + STL + BLK + TOV + PTS + FG. + 
-              X3P.,
-            data=box, distribution = "gaussian", n.trees = 3000, interaction.depth = 10, shrinkage = 0.01)  
+               X3P.,
+             data=box, distribution = "gaussian", n.trees = 3000, interaction.depth = 10, shrinkage = 0.01)  
 
 week1 = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/week_1_game_data.csv")
 library(stringr)
@@ -89,13 +89,24 @@ library(stringr)
 week6$Name = paste(str_split(week6$Name, ' ', simplify = TRUE)[,2], str_split(week6$Name, ' ', simplify = TRUE)[,3])
 pweek6 = predict(gbm_1, newdata = week6)
 dfweek6 <- data.frame("Name" = week6$Name, "BPM_Pred" = pweek6)
-knitr::kable(dfweek6 %>% arrange(-BPM_Pred), caption = "Week 5 games player rankings")
+knitr::kable(dfweek6 %>% arrange(-BPM_Pred), caption = "Week 6 games player rankings")
 
+
+# Week 7
+
+week7 = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/week_7_game_data.csv")
+library(stringr)
+# Get rid of the number
+week7$Name = paste(str_split(week7$Name, ' ', simplify = TRUE)[,2], str_split(week7$Name, ' ', simplify = TRUE)[,3])
+pweek7 = predict(gbm_1, newdata = week7)
+dfweek7 <- data.frame("Name" = week7$Name, "BPM_Pred" = pweek7)
+knitr::kable(dfweek7 %>% arrange(-BPM_Pred), caption = "Week 7 games player rankings")
 
 
 # Cumulative
-cum_games = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/cum_total_07_dec.csv")
+cum_games = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/cum_total_27_dec.csv")
 cum_games$Name = paste(str_split(cum_games$Name, ' ', simplify = TRUE)[,2], str_split(cum_games$Name, ' ', simplify = TRUE)[,3])
 pcum = predict(gbm_1, newdata = cum_games)
 df_cum <- data.frame("Name" = cum_games$Name, "BPM_Pred" = pcum)
 knitr::kable(df_cum %>% arrange(-BPM_Pred), caption = "All games player rankings")
+
