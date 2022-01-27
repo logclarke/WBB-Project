@@ -1,0 +1,209 @@
+---
+title: "WBB Shiny Prep"
+author: "Logan Clarke"
+date: "1/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+Ideas:
+
+Plot one: select player, week, data type (practice or game)
+
+Plot two: select player, week, data type
+
+Visual: bar chart with different players with selected player labeled.
+
+Table: Spits out team average from that week/data type along with player value
+
+```{r}
+#test components of function
+
+library(tidyverse)
+
+#chart with no different colors
+#week 10
+dfweek10 %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = "navy") + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Week 10 Player Rankings (Game Data)") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14)) +
+  geom_hline(yintercept = mean(dfweek10$BPM_Pred), linetype = 'dotted', color = "red") +
+  annotate("text", x = nrow(dfweek10), y = mean(dfweek10$BPM_Pred), label = "Team Average", vjust = -0.5)
+
+nrow(dfweek10)
+
+
+#cumulative
+df_cum %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = "royalblue2") + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Cumulative Season Rankings (Game Data)") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14)) 
+
+
+dfweek10 %>% 
+  ggplot(aes(x = Name, y = BPM_Pred)) +
+  geom_col(fill = ifelse(dfweek9$Name == "Shaylee Gonzales", "royalblue1","navy")) + 
+  labs(y = "Box Plus Minus Ranking", x = "Player") +
+  ggtitle("Week 10 Player Rankings (Game Data)") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14)) 
+
+bpm <- dfweek9 %>% 
+  filter(Name == "Shaylee Gonzales") %>% 
+  select(BPM_Pred)
+
+team_avg <- mean(dfweek9$BPM_Pred)
+
+ovr_undr <- ifelse(bpm >= 0, bpm- team_avg, - (team_avg - bpm))
+
+stats <- data.frame("Name" = "Shaylee Gonzales","Box Plus Minus" = bpm, "Team Average" = team_avg, 
+                    "Difference from Mean" = ovr_undr)
+
+colnames(stats) <- c("Name", "Box Plus Minus", "Team Average Box Plus Minus", 
+                     "Difference Above/Below Team Average")
+
+
+#this is for a summary of one player
+
+week_function <- function(week_df, player) {
+  plot <- ggplot(week_df, aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+    geom_col(fill = ifelse(week_df$Name == player, "royalblue1","navy")) + 
+    labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+    ggtitle("Week 9 Player Rankings") +
+    theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+          axis.title.y = element_text(face = "bold", size = 14),
+          axis.title.x = element_text(face = "bold", size = 14)) 
+  
+  bpm <- week_df %>% 
+    filter(Name == player)%>% 
+    select(BPM_Pred)
+  
+  team_avg <- mean(week_df$BPM_Pred)
+  
+  ovr_undr <- ifelse(bpm >= 0, bpm- team_avg, - (team_avg - bpm))
+  
+  stats <- data.frame("Name" = player, "Box Plus Minus" = bpm, "Team Average" = team_avg, 
+                      "Difference from Mean" = ovr_undr)
+  
+  colnames(stats) <- c("Name", "Box Plus Minus", "Team Average Box Plus Minus", 
+                       "Difference Above/Below Team Average")
+  
+  out <- list(plot, stats)
+  
+  return(out)
+  
+}
+
+week_function(dfweek9, "Paisley Harding")
+
+#now let's adjust this to do two players
+
+week_function2 <- function(week_df, player1, player2) {
+  plot <- ggplot(week_df, aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+    geom_col(fill = ifelse(week_df$Name == player1, "royalblue1", 
+                           ifelse(week_df$Name == player2,"royalblue1","navy"))) + 
+    labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+    ggtitle("Week 9 Player Rankings") +
+    theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+          axis.title.y = element_text(face = "bold", size = 14),
+          axis.title.x = element_text(face = "bold", size = 14)) +
+  geom_hline(yintercept = mean(week_df$BPM_Pred), linetype = 'dotted', color = "red") +
+  annotate("text", x = nrow(week_df) - 1, y = mean(week_df$BPM_Pred), label = "Team Average", vjust = -0.5)
+  
+  bpm1 <- week_df %>% 
+    filter(Name == player1) %>% 
+    select(BPM_Pred)
+  
+  #isolate just the score. We don't want the column name here
+  bpm1 <- bpm1[1,]
+  
+  bpm2 <- week_df %>% 
+    filter(Name == player2) %>% 
+    select(BPM_Pred)
+  
+  #isolate just the score. We don't want the column name here
+  bpm2 <- bpm2[1,]
+  
+  team_avg <- mean(week_df$BPM_Pred)
+  
+  ovr_undr1 <- ifelse(bpm1 >= 0, bpm1- team_avg, - (team_avg - bpm1))
+  
+  ovr_undr2 <- ifelse(bpm2 >= 0, bpm2- team_avg, - (team_avg - bpm2))
+  
+  stats <- bind_cols("Name" = c(player1, player2), 
+                      "Box Plus Minus" = c(bpm1, bpm2), 
+                      "Difference from Mean" = c(ovr_undr1, ovr_undr2))
+  
+  colnames(stats) <- c("Name", 
+                       "Box Plus Minus", 
+                       "Difference Above/Below Team Average")
+  
+  out <- list(plot, stats)
+  
+  return(out)
+  
+}
+
+week_function2(dfweek10, "Shaylee Gonzales", "Paisley Harding")
+
+
+
+```
+
+
+
+Data files for the shiny
+```{r}
+#write csv here
+write_csv(dfweek10, "dfweek10.csv")
+write_csv(dfweek9, "dfweek9.csv")
+write_csv(dfweek8, "dfweek8.csv")
+write_csv(dfweek7, "dfweek7.csv")
+write_csv(dfweek6, "dfweek6.csv")
+write_csv(dfweek5, "dfweek5.csv")
+write_csv(dfweek4, "dfweek4.csv")
+write_csv(dfweek3, "dfweek3.csv")
+write_csv(dfweek2, "dfweek2.csv")
+write_csv(dfweek1, "dfweek1.csv")
+#this next one needs to be updated every single week
+write_csv(df_cum, "df_cum.csv")
+
+
+#copy and paste this into the shiny server
+dfweek10_shiny <- read.csv("dfweek10.csv")
+dfweek9_shiny <- read.csv("dfweek9.csv")
+dfweek8_shiny <- read.csv("dfweek8.csv")
+dfweek7_shiny <- read.csv("dfweek7.csv")
+dfweek6_shiny <- read.csv("dfweek6.csv")
+dfweek5_shiny <- read.csv("dfweek5.csv")
+dfweek4_shiny <- read.csv("dfweek4.csv")
+dfweek3_shiny <- read.csv("dfweek3.csv")
+dfweek2_shiny <- read.csv("dfweek2.csv")
+dfweek1_shiny <- read.csv("dfweek1.csv")
+#this next one needs to be updated every single week
+df_cum_shiny <- read.csv("df_cum.csv")
+
+
+
+
+```
+
