@@ -26,21 +26,38 @@ Table: Spits out team average from that week/data type along with player value
 
 library(tidyverse)
 
-#chart with no different colors
-#week 10
-dfweek10 %>% 
+#Weekly charts for the email to Melanie
+#week 13
+dfweek13 %>% 
   ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
   geom_col(fill = "navy") + 
   labs(y = "Box Plus Minus Ranking", x = "Player Name") +
-  ggtitle("Week 10 Player Rankings (Game Data)") +
+  ggtitle("Week 13 Player Rankings (Game Data)") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14),
+        legend.justification = c("right", "top")) +
+  geom_hline(yintercept = mean(dfweek13$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(dfweek13) - 1, y = mean(dfweek13$BPM_Pred), 
+                 label = "Team Average", vjust = -0.5), size = 5)
+
+
+#cumulative
+df_cum %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = "navy") + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Cumulative Season Rankings (Game Data)") +
   theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
         plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
         axis.title.y = element_text(face = "bold", size = 14),
         axis.title.x = element_text(face = "bold", size = 14)) +
-  geom_hline(yintercept = mean(dfweek10$BPM_Pred), linetype = 'dotted', color = "red") +
-  annotate("text", x = nrow(dfweek10), y = mean(dfweek10$BPM_Pred), label = "Team Average", vjust = -0.5)
+  geom_hline(yintercept = mean(df_cum$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(dfweek12) - 1, y = mean(df_cum$BPM_Pred), label = "Team Average", vjust = -0.5), size = 5)
 
-nrow(dfweek10)
+
+# nrow(df_cum)
 
 
 #cumulative
@@ -63,7 +80,7 @@ dfweek10 %>%
   theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
         plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
         axis.title.y = element_text(face = "bold", size = 14),
-        axis.title.x = element_text(face = "bold", size = 14)) 
+        axis.title.x = element_text(face = "bold", size = 14),) 
 
 bpm <- dfweek9 %>% 
   filter(Name == "Shaylee Gonzales") %>% 
@@ -168,12 +185,37 @@ week_function2(dfweek10, "Shaylee Gonzales", "Paisley Harding")
 
 
 ```
+Figuring out why the week 5 chart is so wonky
+```{r}
+data_available <- combined[combined$week == input$data_set, c("Name", "BPM_Pred")]
+
+library(tidyverse)
+
+dfweek5 %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = ifelse(dfweek5$Name == "Shaylee Gonzales", "royalblue1", 
+                         ifelse(dfweek5$Name == "Tegan Graham", "royalblue1", "navy"))) + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Player Model Score Comparison") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14),
+        legend.justification = c("right", "top")) +
+  geom_hline(yintercept = mean(dfweek5$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(dfweek5) - 1, y = mean(BPM_Pred), 
+                 label = "Team Average", vjust = -0.5), size = 5)
+```
+
 
 
 
 Data files for the shiny
 ```{r}
 #write csv here
+write_csv(dfweek13, "dfweek13.csv")
+write_csv(dfweek12, "dfweek12.csv")
+write_csv(dfweek11, "dfweek11.csv")
 write_csv(dfweek10, "dfweek10.csv")
 write_csv(dfweek9, "dfweek9.csv")
 write_csv(dfweek8, "dfweek8.csv")
@@ -185,25 +227,175 @@ write_csv(dfweek3, "dfweek3.csv")
 write_csv(dfweek2, "dfweek2.csv")
 write_csv(dfweek1, "dfweek1.csv")
 #this next one needs to be updated every single week
-write_csv(df_cum, "df_cum.csv")
+write_csv(df_cum, "df_cum13.csv")
 
 
-#copy and paste this into the shiny server
-dfweek10_shiny <- read.csv("dfweek10.csv")
-dfweek9_shiny <- read.csv("dfweek9.csv")
-dfweek8_shiny <- read.csv("dfweek8.csv")
-dfweek7_shiny <- read.csv("dfweek7.csv")
-dfweek6_shiny <- read.csv("dfweek6.csv")
-dfweek5_shiny <- read.csv("dfweek5.csv")
-dfweek4_shiny <- read.csv("dfweek4.csv")
-dfweek3_shiny <- read.csv("dfweek3.csv")
-dfweek2_shiny <- read.csv("dfweek2.csv")
-dfweek1_shiny <- read.csv("dfweek1.csv")
+
+#test the rbind
+
+#Read in dataframes that will be used
+week_12_game_data <- read.csv("dfweek12.csv")
+week_11_game_data <- read.csv("dfweek11.csv")
+week_10_game_data <- read.csv("dfweek10.csv")
+week_9_game_data <- read.csv("dfweek9.csv")
+week_8_game_data <- read.csv("dfweek8.csv")
+week_7_game_data <- read.csv("dfweek7.csv")
+week_6_game_data <- read.csv("dfweek6.csv")
+week_5_game_data <- read.csv("dfweek5.csv")
+week_4_game_data <- read.csv("dfweek4.csv")
+week_3_game_data <- read.csv("dfweek3.csv")
+week_2_game_data <- read.csv("dfweek2.csv")
+week_1_game_data <- read.csv("dfweek1.csv")
 #this next one needs to be updated every single week
-df_cum_shiny <- read.csv("df_cum.csv")
+cumulative_game_data <- read.csv("df_cum.csv")
 
+data_sets <- c("week_12_game_data", "week_11_game_data", "week_10_game_data", "week_9_game_data", "week_8_game_data", 
+               "week_7_game_data", "week_6_game_data", "week_5_game_data", "week_4_game_data",
+               "week_3_game_data", "week_2_game_data", "week_1_game_data", "cumulative_game_data")
+
+week_12_game_data <- week_12_game_data %>% 
+  mutate(week = "week_12_game")
+
+week_11_game_data <- week_11_game_data %>% 
+  mutate(week = "week_11_game")
+
+week_10_game_data <- week_10_game_data %>% 
+  mutate(week = "week_10_game")
+
+week_9_game_data <- week_9_game_data %>% 
+  mutate(week = "week_11_game")
+
+week_8_game_data <- week_8_game_data %>% 
+  mutate(week = "week_8_game")
+
+week_7_game_data <- week_7_game_data %>% 
+  mutate(week = "week_7_game")
+
+week_6_game_data <- week_6_game_data %>% 
+  mutate(week = "week_6_game")
+
+week_5_game_data <- week_5_game_data %>% 
+  mutate(week = "week_5_game")
+
+week_4_game_data <- week_4_game_data %>% 
+  mutate(week = "week_4_game")
+
+week_3_game_data <- week_3_game_data %>% 
+  mutate(week = "week_3_game")
+
+week_2_game_data <- week_2_game_data %>% 
+  mutate(week = "week_2_game")
+
+week_1_game_data <- week_1_game_data %>% 
+  mutate(week = "week_1_game")
+
+cumulative_game_data <- cumulative_game_data %>% 
+  mutate(week = "cumulative_game")
+
+
+
+combined <- rbind(week_12_game_data, week_11_game_data, week_10_game_data, week_9_game_data, week_8_game_data, 
+              week_7_game_data, week_6_game_data, week_5_game_data, week_5_game_data, week_4_game_data, 
+              week_3_game_data, week_2_game_data, week_1_game_data, cumulative_game_data)
+
+combined$week
+
+
+```
+
+
+
+```{r}
+library(maps)
+
+
+countyData = read.table(
+  text = "State County
+ Delaware Kent
+ Delaware 'New Castle'
+ Delaware Sussex
+ 'Rhode Island' Bristol
+ 'Rhode Island' Kent
+ 'Rhode Island' Newport
+ 'Rhode Island' Providence
+ 'Rhode Island' Washington",
+  header = TRUE, stringsAsFactors = FALSE)
+
+str(countyData)
+str(combined)
+
+countyData$State
+
+data_available1 = countyData[countyData$State == "Delaware", "County"]
+data_available1 = combined[combined$week == "cumulative_game", c("Name", "BPM_Pred")]
+mean(data_available1[2]$BPM_Pred)
+length(data_available1[2]$BPM_Pred)
+length(data_available1[1]$Name)
+length(data_available1)
+
+is.data.frame(data_available1)
+
+data_available1
+
+str(data_available1[1])
+str(data_available1[1]$Name)
+
+
+#let's figure out this plot
+data_available1 <- combined[combined$week == "cumulative_game", c("Name", "BPM_Pred")]
+
+ggplot(data_available1, aes(x = reorder(Name, -BPM_Pred), 
+                           y = BPM_Pred)) +
+  geom_col(fill = ifelse(Name == "Shaylee Gonzales", "royalblue1", "navy")) +
+  # ifelse(input$data_set$Name == player2,"royalblue1","navy"))) +
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Week 12 Player Rankings") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold", size = 12),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 20),
+        axis.title.x = element_text(face = "bold", size = 20)) +
+  geom_hline(yintercept = mean(BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(Name) - 1,
+                 y = mean(BPM_Pred), label = "Team Average", vjust = -0.5), size = 5)
+
+str(data_available1)
+str(dfweek12)
+
+
+#plot for one player
+data_available1 %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = ifelse(data_available1$Name == "Shaylee Gonzales", "royalblue1", "navy")) + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Week 12 Player Rankings (Game Data)") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14),
+        legend.justification = c("right", "top")) +
+  geom_hline(yintercept = mean(data_available1$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(data_available1) - 1, y = mean(BPM_Pred), 
+                 label = "Team Average", vjust = -0.5), size = 5)
+
+
+#plot for two players
+data_available1 %>% 
+  ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
+  geom_col(fill = ifelse(data_available1$Name == "Shaylee Gonzales", "royalblue1", 
+                         ifelse(data_available1$Name == "Paisley Harding", "royalblue1", "navy"))) + 
+  labs(y = "Box Plus Minus Ranking", x = "Player Name") +
+  ggtitle("Player Model Score Comparison") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14),
+        legend.justification = c("right", "top")) +
+  geom_hline(yintercept = mean(data_available1$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(data_available1) - 1, y = mean(BPM_Pred), 
+                 label = "Team Average", vjust = -0.5), size = 5)
 
 
 
 ```
+
 
