@@ -11,7 +11,7 @@ library(readxl)
 library(plyr)
 library(tibble)
 
-data_ref <- "/Users/loganclarke/Documents/WBB Project/WBBGame stats.xlsx"
+data_ref <- "/Users/loganclarke/WBB R Project/Excel Process/WBBGame stats.xlsx"
 
 excel_sheets(path = data_ref)
 
@@ -38,7 +38,7 @@ clean_week(latest_week)
 
 Creating csv files for the cumulative total
 ```{r}
-data_ref <- "/Users/loganclarke/Documents/WBB Project/WBBGame stats.xlsx"
+data_ref <- "/Users/loganclarke/WBB R Project/Excel Process/WBBGame stats.xlsx"
 
 excel_sheets(path = data_ref)
 
