@@ -8,6 +8,7 @@ library(shinythemes)
 #Make sure to write weekly csv and update the cumulative csv in WBB Shiny prep.Rmd
 
 #Read in dataframes that will be used
+week_14_game_data <- read.csv("dfweek14.csv")
 week_13_game_data <- read.csv("dfweek13.csv")
 week_12_game_data <- read.csv("dfweek12.csv")
 week_11_game_data <- read.csv("dfweek11.csv")
@@ -22,73 +23,93 @@ week_3_game_data <- read.csv("dfweek3.csv")
 week_2_game_data <- read.csv("dfweek2.csv")
 week_1_game_data <- read.csv("dfweek1.csv")
 #this next one needs to be updated every single week
-cumulative_game_data <- read.csv("df_cum13.csv")
+cumulative_game_data <- read.csv("df_cum14.csv")
 
 
 #We need all this data in a single dataset where we can filter by column name. Here we will add
 
+week_14_game_data <- week_14_game_data %>% 
+  mutate(week = "Week 14 Game Data",
+         week_num = 14)
+
 week_13_game_data <- week_13_game_data %>% 
-  mutate(week = "Week 13 Game Data")
+  mutate(week = "Week 13 Game Data",
+         week_num = 13)
 
 week_12_game_data <- week_12_game_data %>% 
-  mutate(week = "Week 12 Game Data")
+  mutate(week = "Week 12 Game Data",
+         week_num = 12)
 
 week_11_game_data <- week_11_game_data %>% 
-  mutate(week = "Week 11 Game Data")
+  mutate(week = "Week 11 Game Data",
+         week_num = 11)
 
 week_10_game_data <- week_10_game_data %>% 
-  mutate(week = "Week 10 Game Data")
+  mutate(week = "Week 10 Game Data",
+         week_num = 10)
 
 week_9_game_data <- week_9_game_data %>% 
-  mutate(week = "Week 9 Game Data")
+  mutate(week = "Week 9 Game Data",
+         week_num = 9)
 
 week_8_game_data <- week_8_game_data %>% 
-  mutate(week = "Week 8 Game Data")
+  mutate(week = "Week 8 Game Data",
+         week_num = 8)
 
 week_7_game_data <- week_7_game_data %>% 
-  mutate(week = "Week 7 Game Data")
+  mutate(week = "Week 7 Game Data",
+         week_num = 7)
 
 week_6_game_data <- week_6_game_data %>% 
-  mutate(week = "Week 6 Game Data")
+  mutate(week = "Week 6 Game Data",
+         week_num = 6)
 
 week_5_game_data <- week_5_game_data %>% 
-  mutate(week = "Week 5 Game Data")
+  mutate(week = "Week 5 Game Data",
+         week_num = 5)
 
 week_4_game_data <- week_4_game_data %>% 
-  mutate(week = "Week 4 Game Data")
+  mutate(week = "Week 4 Game Data",
+         week_num = 4)
 
 week_3_game_data <- week_3_game_data %>% 
-  mutate(week = "Week 3 Game Data")
+  mutate(week = "Week 3 Game Data",
+         week_num = 3)
 
 week_2_game_data <- week_2_game_data %>% 
-  mutate(week = "Week 2 Game Data")
+  mutate(week = "Week 2 Game Data",
+         week_num = 2)
 
 week_1_game_data <- week_1_game_data %>% 
-  mutate(week = "Week 1 Game Data")
+  mutate(week = "Week 1 Game Data",
+         week_num = 1)
 
 cumulative_game_data <- cumulative_game_data %>% 
-  mutate(week = "Cumulative Game Data")
+  mutate(week = "Cumulative Game Data",
+         week_num = NA)
 
 
 
 combined <- rbind(week_1_game_data, week_2_game_data, week_3_game_data, week_4_game_data, week_5_game_data, 
                   week_6_game_data, week_7_game_data, week_8_game_data, week_9_game_data, 
                   week_10_game_data, week_11_game_data, week_12_game_data, week_13_game_data,
-                  cumulative_game_data)
+                  week_14_game_data, cumulative_game_data)
+
+combined$Name[combined$Name == "Paisley Johnson"] <- "Paisley Harding"
 
 
 ##Section 2 ____________________________________________________
 #set up the user interface
 ui <- navbarPage("Women's Basketball Player Comparison 2", theme = shinytheme("darkly"),
                  
-                 tabPanel("Player Comparison", 
+                 tabPanel("Weekly Comparison", 
                           
                           fluidPage( #allows layout to fill browser window
-                            titlePanel(h1("WBB Player Comparison", align = "center")),
+                            titlePanel(h1("Player Game Score Comparison", align = "center")),
                             #adds a title to page and browser tab
                             #-use "title = 'tab name'" to name browser tab
                             sidebarPanel( #designates location of following items
-                              htmlOutput("data_selector"),#add selectinput boxs
+                              htmlOutput("data_selector"),#add select input boxes
                               htmlOutput("player_selector1"),  # from objects created in server
                               htmlOutput("player_selector2")# from objects created in server
                             ),
@@ -98,7 +119,26 @@ ui <- navbarPage("Women's Basketball Player Comparison 2", theme = shinytheme("d
                               tableOutput("player_table")
                             )
                           ) 
+                 ),
+                 tabPanel("Season Trends", 
+                          
+                          fluidPage( #allows layout to fill browser window
+                            titlePanel(h1("Player Season Trendlines", align = "center")),
+                            #adds a title to page and browser tab
+                            #-use "title = 'tab name'" to name browser tab
+                            sidebarPanel( #designates location of following items
+                              #  htmlOutput("data_selector"),#add selectinput boxs
+                              htmlOutput("player_selector3"),  # from objects created in server
+                              htmlOutput("player_selector4") # from objects created in server
+                            ),
+                            
+                            mainPanel(
+                              plotOutput("plot2"), #put plot item in main area
+                              tableOutput("player_table2")
+                            )
+                          ) 
                  )
+                 
 )
 
 
@@ -122,7 +162,7 @@ server = shinyServer(function(input, output) {
     selectInput(inputId = "player1", #name of input
                 label = "Player 1:", #label displayed in ui
                 choices = unique(data_available[1]), #calls list of available counties
-                selected = unique(data_available)[1])
+                selected = "Shaylee Gonzales")
   })
   output$player_selector2 = renderUI({#creates player select box object called in ui
     
@@ -132,7 +172,26 @@ server = shinyServer(function(input, output) {
     selectInput(inputId = "player2", #name of input
                 label = "Player 2:", #label displayed in ui
                 choices = unique(data_available[1]), #calls list of available counties
-                selected = unique(data_available)[1])
+                selected = "Paisley Harding")
+  })
+  
+  # added this
+  output$player_selector3 = renderUI({#creates player select box object called in ui
+    
+    selectInput(inputId = "player3", #name of input
+                label = "Player 1:", #label displayed in ui
+                choices = unique(combined$Name), #calls list of available counties
+                selected = "Shaylee Gonzales")
+  })
+    
+    
+    #added this too
+  output$player_selector4 = renderUI({#creates player select box object called in ui
+    
+    selectInput(inputId = "player4", #name of input
+                label = "Player 2:", #label displayed in ui
+                choices = unique(combined$Name), #calls list of available counties
+                selected = "Paisley Harding")
   })
   
   output$plot1 = renderPlot({ #creates a the plot to go in the mainPanel
@@ -190,6 +249,51 @@ server = shinyServer(function(input, output) {
     stats
     
   })
+  
+  output$plot2 = renderPlot({ #creates a the plot to go in the mainPanel
+    
+    combined %>% 
+      filter(Name == input$player3 | Name == input$player4) %>% 
+      ggplot(aes(x = week_num, y = BPM_Pred, col = Name)) +
+      geom_line() +
+      labs(y = "BPM Score", x = "Week") +
+      ggtitle("Player Rankings Through Time") +
+      theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+            axis.title.y = element_text(face = "bold", size = 14),
+            axis.title.x = element_text(face = "bold", size = 14),
+            axis.text.x = element_text(size = 12),
+            axis.text.y = element_text(size = 12),
+            legend.text = element_text(size = 14),
+            legend.title = element_text(size = 15)) +
+      #need to update the x each week
+      scale_x_continuous(breaks = seq(1, 14, 1)) +
+      scale_y_continuous(breaks = seq(round(min(combined$BPM_Pred)), round(max(combined$BPM_Pred)), 2)) +
+      scale_color_manual(values=c('navy','royalblue1'))
+  }) 
+  
+  output$player_table2 <- renderTable({
+
+    mean1 <- combined %>% 
+      filter(Name == input$player3) %>% 
+      summarise(mean = mean(BPM_Pred))
+    
+    mean1 <- mean1[1,]
+    
+    mean2 <- combined %>% 
+      filter(Name == input$player4) %>% 
+      summarise(mean = mean(BPM_Pred))
+    
+    mean2 <- mean2[1,]
+    
+    table <- bind_cols("Name" = c(input$player3, input$player4),
+                       "Average Weekly Score" = c(mean1, mean2))
+    
+    table
+  })
+  
+  
+  
+  
 })#close the shinyServer
 
 ##Section 4____________________________________________________

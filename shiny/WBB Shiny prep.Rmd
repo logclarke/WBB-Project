@@ -27,19 +27,19 @@ Table: Spits out team average from that week/data type along with player value
 library(tidyverse)
 
 #Weekly charts for the email to Melanie
-#week 13
-dfweek13 %>% 
+#week 14
+dfweek14 %>% 
   ggplot(aes(x = reorder(Name, -BPM_Pred), y = BPM_Pred)) +
   geom_col(fill = "navy") + 
   labs(y = "Box Plus Minus Ranking", x = "Player Name") +
-  ggtitle("Week 13 Player Rankings (Game Data)") +
+  ggtitle("Week 14 Player Rankings (Game Data)") +
   theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, face = "bold"),
         plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
         axis.title.y = element_text(face = "bold", size = 14),
         axis.title.x = element_text(face = "bold", size = 14),
         legend.justification = c("right", "top")) +
-  geom_hline(yintercept = mean(dfweek13$BPM_Pred), linetype = 'dotted', color = "red") +
-  geom_label(aes(x = nrow(dfweek13) - 1, y = mean(dfweek13$BPM_Pred), 
+  geom_hline(yintercept = mean(dfweek14$BPM_Pred), linetype = 'dotted', color = "red") +
+  geom_label(aes(x = nrow(dfweek14) - 1, y = mean(dfweek14$BPM_Pred), 
                  label = "Team Average", vjust = -0.5), size = 5)
 
 
@@ -54,7 +54,7 @@ df_cum %>%
         axis.title.y = element_text(face = "bold", size = 14),
         axis.title.x = element_text(face = "bold", size = 14)) +
   geom_hline(yintercept = mean(df_cum$BPM_Pred), linetype = 'dotted', color = "red") +
-  geom_label(aes(x = nrow(dfweek12) - 1, y = mean(df_cum$BPM_Pred), label = "Team Average", vjust = -0.5), size = 5)
+  geom_label(aes(x = nrow(df_cum) - 1, y = mean(df_cum$BPM_Pred), label = "Team Average", vjust = -0.5), size = 5)
 
 
 # nrow(df_cum)
@@ -185,7 +185,7 @@ week_function2(dfweek10, "Shaylee Gonzales", "Paisley Harding")
 
 
 ```
-Figuring out why the week 5 chart is so wonky
+Figuring out why the week 5 chart is so wonky - I had accidentally joined two week 5 sets into one in the shiny app compilation.
 ```{r}
 data_available <- combined[combined$week == input$data_set, c("Name", "BPM_Pred")]
 
@@ -213,6 +213,7 @@ dfweek5 %>%
 Data files for the shiny
 ```{r}
 #write csv here
+write_csv(dfweek14, "dfweek14.csv")
 write_csv(dfweek13, "dfweek13.csv")
 write_csv(dfweek12, "dfweek12.csv")
 write_csv(dfweek11, "dfweek11.csv")
@@ -227,13 +228,14 @@ write_csv(dfweek3, "dfweek3.csv")
 write_csv(dfweek2, "dfweek2.csv")
 write_csv(dfweek1, "dfweek1.csv")
 #this next one needs to be updated every single week
-write_csv(df_cum, "df_cum13.csv")
+write_csv(df_cum, "df_cum14.csv")
 
 
 
 #test the rbind
 
 #Read in dataframes that will be used
+week_13_game_data <- read.csv("dfweek13.csv")
 week_12_game_data <- read.csv("dfweek12.csv")
 week_11_game_data <- read.csv("dfweek11.csv")
 week_10_game_data <- read.csv("dfweek10.csv")
@@ -247,11 +249,14 @@ week_3_game_data <- read.csv("dfweek3.csv")
 week_2_game_data <- read.csv("dfweek2.csv")
 week_1_game_data <- read.csv("dfweek1.csv")
 #this next one needs to be updated every single week
-cumulative_game_data <- read.csv("df_cum.csv")
+cumulative_game_data <- read.csv("df_cum13.csv")
 
 data_sets <- c("week_12_game_data", "week_11_game_data", "week_10_game_data", "week_9_game_data", "week_8_game_data", 
                "week_7_game_data", "week_6_game_data", "week_5_game_data", "week_4_game_data",
                "week_3_game_data", "week_2_game_data", "week_1_game_data", "cumulative_game_data")
+
+week_13_game_data <- week_13_game_data %>% 
+  mutate(week = "week_13_game")
 
 week_12_game_data <- week_12_game_data %>% 
   mutate(week = "week_12_game")
@@ -263,7 +268,7 @@ week_10_game_data <- week_10_game_data %>%
   mutate(week = "week_10_game")
 
 week_9_game_data <- week_9_game_data %>% 
-  mutate(week = "week_11_game")
+  mutate(week = "week_9_game")
 
 week_8_game_data <- week_8_game_data %>% 
   mutate(week = "week_8_game")
@@ -398,4 +403,125 @@ data_available1 %>%
 
 ```
 
+
+Make a player plot through time
+```{r}
+week_13_game_data <- week_13_game_data %>% 
+  mutate(week_num = 13)
+
+week_12_game_data <- week_12_game_data %>% 
+  mutate(week_num = 12)
+
+week_11_game_data <- week_11_game_data %>% 
+  mutate(week_num = 11)
+
+week_10_game_data <- week_10_game_data %>% 
+  mutate(week_num = 10)
+
+week_9_game_data <- week_9_game_data %>% 
+  mutate(week_num = 9)
+
+week_8_game_data <- week_8_game_data %>% 
+  mutate(week_num = 8)
+
+week_7_game_data <- week_7_game_data %>% 
+  mutate(week_num = 7)
+
+week_6_game_data <- week_6_game_data %>% 
+  mutate(week_num = 6)
+
+week_5_game_data <- week_5_game_data %>% 
+  mutate(week_num = 5)
+
+week_4_game_data <- week_4_game_data %>% 
+  mutate(week_num = 4)
+
+week_3_game_data <- week_3_game_data %>% 
+  mutate(week_num = 3)
+
+week_2_game_data <- week_2_game_data %>% 
+  mutate(week_num = 2)
+
+week_1_game_data <- week_1_game_data %>% 
+  mutate(week_num = 1)
+
+cumulative_game_data <- cumulative_game_data %>% 
+  mutate(week_num = NA)
+
+
+combined_no_cum <- rbind(week_1_game_data, week_2_game_data, week_3_game_data, week_4_game_data, week_5_game_data, 
+                  week_6_game_data, week_7_game_data, week_8_game_data, week_9_game_data, 
+                  week_10_game_data, week_11_game_data, week_12_game_data, week_13_game_data, cumulative_game_data)
+
+#solve paisley harding - paisley johnson issue
+
+combined_test <- combined_no_cum
+
+combined_test$Name[combined_test$Name == "Paisley Johnson"] <- "Paisley Harding"
+
+library(tidyverse)
+
+combined_no_cum %>% 
+  filter(Name == "Shaylee Gonzales" | Name == "Tegan Graham") %>% 
+  ggplot(aes(x = week_num, y = BPM_Pred, col = Name)) +
+  geom_line() +
+  labs(y = "BPM Score", x = "Week") +
+  ggtitle("Player Rankings Through Time") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14)) +
+  #      legend.justification = c("right", "top")) +
+  scale_x_continuous(breaks = seq(1, max(combined_no_cum$week_num), 1)) +
+  scale_y_continuous(breaks = seq(round(min(combined_no_cum$BPM_Pred)), round(max(combined_no_cum$BPM_Pred)), 2)) +
+  scale_color_manual(values=c('navy','royalblue1'))
+  
+#Paisley is listed under paisley johnson for the first 3 weeks
+
+# mean and confidence interval of score?
+
+mean4 <- combined_no_cum %>% 
+  filter(Name == "Shaylee Gonzales") %>% 
+  summarise(mean = mean(BPM_Pred))
+
+mean4 <- mean4[1,]
+
+
+time_part <- function(player1, player2){
+  plot <- combined_no_cum %>% 
+  filter(Name == player1 | Name == player2) %>% 
+  ggplot(aes(x = week_num, y = BPM_Pred, col = Name)) +
+  geom_line() +
+  labs(y = "BPM Score", x = "Week") +
+  ggtitle("Player Rankings Through Time") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.title.x = element_text(face = "bold", size = 14)) +
+  #      legend.justification = c("right", "top")) +
+  scale_x_continuous(breaks = seq(1, 13, 1)) +
+  scale_y_continuous(breaks = seq(round(min(combined_no_cum$BPM_Pred)), round(max(combined_no_cum$BPM_Pred), 5))) +
+  scale_color_manual(values=c('navy','royalblue1'))
+  
+  mean1 <- combined_no_cum %>% 
+    filter(Name == player1) %>% 
+    summarise(mean = mean(BPM_Pred))
+  
+  mean1 <- mean1[1,]
+  
+  mean2 <- combined_no_cum %>% 
+    filter(Name == player2) %>% 
+    summarise(mean = mean(BPM_Pred))
+  
+  mean2 <- mean2[1,]
+  
+  table <- bind_cols("Name" = c(player1, player2),
+                     "Average Weekly Score" = c(mean1, mean2))
+  
+  out <- list(plot, table)
+  
+  return(out)
+}
+
+time_part("Sara Hamson", "Tegan Graham")
+  
+```
 
