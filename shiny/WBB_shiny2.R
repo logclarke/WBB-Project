@@ -100,8 +100,79 @@ combined$Name[combined$Name == "Paisley Johnson"] <- "Paisley Harding"
 
 ##Section 2 ____________________________________________________
 #set up the user interface
-ui <- navbarPage("Women's Basketball Player Comparison 2", theme = shinytheme("darkly"),
+ui <- navbarPage("Women's Basketball Player Comparison", theme = shinytheme("darkly"),
                  
+                # tab with information about the model and the charts
+                 tabPanel("About",
+                          verbatimTextOutput("About"),
+                          fluidPage(
+                            tags$b("Application Info", style = "font-size:30px"),
+                            br(), #adds an empty line
+                            br(),
+                            br(),
+                            tags$b("Weekly Comparison:", style = "font-size:25px"),
+                            br(),
+                            br(),
+                            tags$ul( #bulleted list
+                              tags$li("The Weekly Comparison tab contains a dropdown list of weeks of game 
+                                   data (including a cumulative season total), dropdown lists to compare 
+                                   two players, and the resulting plots and tables to represent the data. 
+                                   This tool will allow for comparison of two players visually and numerically
+                                   in the context of the team's performance for a given week.", 
+                                      style = "font-size:15px"
+                                   )
+                            ),
+                            br(),
+                            tags$b("Season Trends:", style = "font-size:25px"),
+                            br(),
+                            br(),
+                            tags$ul(
+                              tags$li("The Season Trends tab dropdown lists to enable the selection and comparison
+                                   of two players. The resulting plot shows a line plot showing the season trend of 
+                                   each of the selected players along with their season average.", 
+                                      style = "font-size:15px"
+                                   )
+                            ),
+                            hr(),
+                            tags$b("BPM Interpretation", style = "font-size:25px"),
+                            br(),
+                            br(),
+                            tags$ul(
+                              tags$li("The higher (more positive) a player's score is, the better they performed.
+                                      While looking at a player's raw BPM is insightful, we find it often an 
+                                      even better tool to be able to compare their score to the rest of the team.
+                                      This can be a useful tool, especially when comparing players of the same
+                                      position to determine playing time and player usage.", 
+                                  style = "font-size:15px"
+                                  ),
+                              tags$li("We should note that in some weeks these player rankings may be slightly
+                                    skewed in weeks where both games were blowouts. Our model does not filter out
+                                    garbage minutes, so some bench players may have inflated BPM scores in those
+                                    weeks. In these cases, looking at the cumulative season data may be useful to 
+                                    see overall season trends as opposed to one inflated week",
+                                    style = "font-size:15px"
+                                    
+                            )
+                          ),
+                          br(),
+                          tags$b("Data:", style = "font-size:25px"),
+                          br(),
+                          br(),
+                          tags$ul(
+                            tags$li("Game data is collected each week from Synergy Sports.", 
+                                   style = "font-size:15px"
+                            ),
+                            tags$li("Practice data is collected by team managers.",
+                                      style = "font-size:15px"
+                            )
+                          ),
+                          br(),
+                          br()
+
+                 )
+                 ),
+                 
+                 #tab with the week team charts
                  tabPanel("Weekly Comparison", 
                           
                           fluidPage( #allows layout to fill browser window
@@ -120,6 +191,8 @@ ui <- navbarPage("Women's Basketball Player Comparison 2", theme = shinytheme("d
                             )
                           ) 
                  ),
+                 
+                 #tab with the season trend charts
                  tabPanel("Season Trends", 
                           
                           fluidPage( #allows layout to fill browser window
@@ -137,7 +210,46 @@ ui <- navbarPage("Women's Basketball Player Comparison 2", theme = shinytheme("d
                               tableOutput("player_table2")
                             )
                           ) 
-                 )
+                 ),
+                
+                #tab with model construction info
+                tabPanel("Model Construction",
+                         fluidPage(
+                           tags$b("Model/Game Score Info", style = "font-size:30px"),
+                           br(),
+                           br(),
+                           br(),
+                           tags$b("Model Construction:", style = "font-size:25px"),
+                           br(),
+                           br(),
+                           tags$b("To evaluate player performance, we wanted to build a model to predict
+                                      the Box Plus/Minus (BPM) as an overall metric of player performance.
+                                      Since the data collected in practice contains fewer statistics (especially 
+                                      minutes played), we collected data from Synergy Sports and calculated the 
+                                      season BPM score for every player on every team in several different conferences. 
+                                      We then divided then built a model (a GBM with 3000 trees) to predict the 
+                                      BPM score we'd previously calculated using only the stats we'd have from 
+                                      practice data.", 
+                                     style = "font-size:15px"
+                             ),
+                           br(),
+                           br(),
+                           tags$b("Our model tends to weight shooting percentage heavily, especially three-point 
+                                      shooting. If a player shoots well from three, their BPM from our model will likely
+                                      increase, and vice versa. Each week we total the stats from all games played
+                                      during the week, run those player totals through the model to get player
+                                      rankings, and update this application with the new dataset.",
+                             style = "font-size:15px"
+                           ),
+                           br(),
+                           br(),
+                           tags$b("For more information on BPM, visit 
+                                     https://www.basketball-reference.com/about/bpm2.html.",
+                                  #figure out how to add a link to the shiny app
+                                  style = "font-size:15px"
+                           )
+                         )
+                )
                  
 )
 
