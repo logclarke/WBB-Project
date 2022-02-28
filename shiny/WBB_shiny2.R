@@ -8,6 +8,7 @@ library(shinythemes)
 #Make sure to write weekly csv and update the cumulative csv in WBB Shiny prep.Rmd
 
 #Read in dataframes that will be used
+week_15_game_data <- read.csv("dfweek15.csv")
 week_14_game_data <- read.csv("dfweek14.csv")
 week_13_game_data <- read.csv("dfweek13.csv")
 week_12_game_data <- read.csv("dfweek12.csv")
@@ -23,10 +24,14 @@ week_3_game_data <- read.csv("dfweek3.csv")
 week_2_game_data <- read.csv("dfweek2.csv")
 week_1_game_data <- read.csv("dfweek1.csv")
 #this next one needs to be updated every single week
-cumulative_game_data <- read.csv("df_cum14.csv")
+cumulative_game_data <- read.csv("df_cum15.csv")
 
 
 #We need all this data in a single dataset where we can filter by column name. Here we will add
+
+week_15_game_data <- week_15_game_data %>% 
+  mutate(week = "Week 15 Game Data",
+         week_num = 15)
 
 week_14_game_data <- week_14_game_data %>% 
   mutate(week = "Week 14 Game Data",
@@ -93,7 +98,7 @@ cumulative_game_data <- cumulative_game_data %>%
 combined <- rbind(week_1_game_data, week_2_game_data, week_3_game_data, week_4_game_data, week_5_game_data, 
                   week_6_game_data, week_7_game_data, week_8_game_data, week_9_game_data, 
                   week_10_game_data, week_11_game_data, week_12_game_data, week_13_game_data,
-                  week_14_game_data, cumulative_game_data)
+                  week_14_game_data, week_15_game_data, cumulative_game_data)
 
 combined$Name[combined$Name == "Paisley Johnson"] <- "Paisley Harding"
 
@@ -378,7 +383,7 @@ server = shinyServer(function(input, output) {
             legend.text = element_text(size = 14),
             legend.title = element_text(size = 15)) +
       #need to update the x each week
-      scale_x_continuous(breaks = seq(1, 14, 1)) +
+      scale_x_continuous(breaks = seq(1, 15, 1)) +
       scale_y_continuous(breaks = seq(round(min(combined$BPM_Pred)), round(max(combined$BPM_Pred)), 2)) +
       scale_color_manual(values=c('navy','royalblue1'))
   }) 
