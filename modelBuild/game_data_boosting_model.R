@@ -39,7 +39,7 @@ dfweek1 <- data.frame("Name" = week1$Name, "BPM_Pred" = pweek1)
 dfweek1$BPM_Pred <- round(dfweek1$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek1 <- dfweek1 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.67132)
 knitr::kable(dfweek1 %>% arrange(-BPM_Pred), caption = "Week 1 games player rankings")
 
 
@@ -56,7 +56,7 @@ dfweek2 <- data.frame("Name" = week2$Name, "BPM_Pred" = pweek2)
 dfweek2$BPM_Pred <- round(dfweek2$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek2 <- dfweek2 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.67132)
 knitr::kable(dfweek2 %>% arrange(-BPM_Pred), caption = "Week 2 games player rankings")
 
 
@@ -71,7 +71,7 @@ dfweek3 <- data.frame("Name" = week3$Name, "BPM_Pred" = pweek3)
 dfweek3$BPM_Pred <- round(dfweek3$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek3 <- dfweek3 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.67132)
 knitr::kable(dfweek3 %>% arrange(-BPM_Pred), caption = "Week 3 games player rankings")
 
 
@@ -87,7 +87,7 @@ dfweek4 <- data.frame("Name" = week4$Name, "BPM_Pred" = pweek4)
 dfweek4$BPM_Pred <- round(dfweek4$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek4 <- dfweek4 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.67132)
 knitr::kable(dfweek4 %>% arrange(-BPM_Pred), caption = "Week 4 games player rankings")
 
 
@@ -103,7 +103,7 @@ dfweek5 <- data.frame("Name" = week5$Name, "BPM_Pred" = pweek5)
 dfweek5$BPM_Pred <- round(dfweek5$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek5 <- dfweek5 %>% 
-  filter(BPM_Pred != -6.67132)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek5 %>% arrange(-BPM_Pred), caption = "Week 5 games player rankings")
 
 # Week 6
@@ -118,7 +118,7 @@ dfweek6 <- data.frame("Name" = week6$Name, "BPM_Pred" = pweek6)
 dfweek6$BPM_Pred <- round(dfweek6$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek6 <- dfweek6 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek6 %>% arrange(-BPM_Pred), caption = "Week 6 games player rankings")
 
 
@@ -134,7 +134,7 @@ dfweek7 <- data.frame("Name" = week7$Name, "BPM_Pred" = pweek7)
 dfweek7$BPM_Pred <- round(dfweek7$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek7 <- dfweek7 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek7 %>% arrange(-BPM_Pred), caption = "Week 7 games player rankings")
 
 
@@ -152,7 +152,7 @@ dfweek8 <- data.frame("Name" = week8$Name, "BPM_Pred" = pweek8)
 dfweek8$BPM_Pred <- round(dfweek8$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek8 <- dfweek8 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek8 %>% arrange(-BPM_Pred), caption = "Week 8 games player rankings")
 
 
@@ -170,7 +170,7 @@ dfweek9 <- data.frame("Name" = week9$Name, "BPM_Pred" = pweek9)
 dfweek9$BPM_Pred <- round(dfweek9$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek9 <- dfweek9 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek9 %>% arrange(-BPM_Pred), caption = "Week 9 games player rankings")
 
 
@@ -188,7 +188,7 @@ dfweek10 <- data.frame("Name" = week10$Name, "BPM_Pred" = pweek10)
 dfweek10$BPM_Pred <- round(dfweek10$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek10 <- dfweek10 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek10 %>% arrange(-BPM_Pred), caption = "Week 10 games player rankings")
 
 
@@ -206,7 +206,7 @@ dfweek11 <- data.frame("Name" = week11$Name, "BPM_Pred" = pweek11)
 dfweek11$BPM_Pred <- round(dfweek11$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek11 <- dfweek11 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek11 %>% arrange(-BPM_Pred), caption = "Week 11 games player rankings")
 
 
@@ -224,7 +224,7 @@ dfweek12 <- data.frame("Name" = week12$Name, "BPM_Pred" = pweek12)
 dfweek12$BPM_Pred <- round(dfweek12$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek12 <- dfweek12 %>% 
-  filter(BPM_Pred != -6.68148)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek12 %>% arrange(-BPM_Pred), caption = "Week 12 games player rankings")
 
 
@@ -242,7 +242,7 @@ dfweek13 <- data.frame("Name" = week13$Name, "BPM_Pred" = pweek13)
 dfweek13$BPM_Pred <- round(dfweek13$BPM_Pred, 5)
 #this gets rid of anyone who didn't play in games
 dfweek13 <- dfweek13 %>% 
-  filter(BPM_Pred != -6.67132)
+  filter(BPM_Pred != -6.69274)
 knitr::kable(dfweek13 %>% arrange(-BPM_Pred), caption = "Week 13 games player rankings")
 
 
@@ -264,9 +264,27 @@ dfweek14 <- dfweek14 %>%
 knitr::kable(dfweek14 %>% arrange(-BPM_Pred), caption = "Week 14 games player rankings")
 
 
+# Week 15
+
+week15 = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/week_15_game_data.csv")
+library(stringr)
+library(gbm)
+library(dplyr)
+# Get rid of the number
+week15$Name = paste(str_split(week15$Name, ' ', simplify = TRUE)[,2], str_split(week15$Name, ' ', simplify = TRUE)[,3])
+pweek15 = predict(gbm_1, newdata = week15)
+dfweek15 <- data.frame("Name" = week15$Name, "BPM_Pred" = pweek15)
+#rounding makes it possible to filter
+dfweek15$BPM_Pred <- round(dfweek15$BPM_Pred, 5)
+#this gets rid of anyone who didn't play in games
+dfweek15 <- dfweek15 %>% 
+  filter(BPM_Pred != -6.67132)
+knitr::kable(dfweek15 %>% arrange(-BPM_Pred), caption = "Week 15 games player rankings")
+
+
 # Cumulative
 #update the date every week on the csv file that's being read in
-cum_games = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/cum_total_21_feb.csv")
+cum_games = read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/Game-data/cum_total_28_feb.csv")
 cum_games$Name = paste(str_split(cum_games$Name, ' ', simplify = TRUE)[,2], str_split(cum_games$Name, ' ', simplify = TRUE)[,3])
 pcum = predict(gbm_1, newdata = cum_games)
 df_cum <- data.frame("Name" = cum_games$Name, "BPM_Pred" = pcum)
