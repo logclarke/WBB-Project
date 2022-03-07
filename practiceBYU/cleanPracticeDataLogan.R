@@ -5,7 +5,7 @@ library(readxl)
 # totals <- read_xlsx(file.path("..", "Practice Data", "practiceDataRaw.xlsx"), 
 #                     sheet = "TOTALS & AVERAGES")
 
-totals <- read_xlsx(path = "/Users/loganclarke/Documents/WBB Project/Practice Data/practiceDataRaw.xlsx", 
+totals <- read_xlsx(path = "/Users/loganclarke/WBB R Project/Practice Data/practiceDataRaw.xlsx", 
                     sheet = "TOTALS & AVERAGES")
 
 totals <- totals[5:which(totals$...3 == "TEAM")[1],]
