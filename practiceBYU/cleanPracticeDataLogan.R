@@ -34,9 +34,11 @@ colnames(totals) <- c("No.", "Name", "Games", "Starts", "Fouls", "DREB", "OREB",
                       "TOTa", "TOTm", "TOTper", "Points")
 
 write.csv(totals, 
-          "/Users/loganclarke/Documents/WBB Project/Practice Data/practiceDataClean.csv", 
+          "/Users/loganclarke/WBB R Project/Practice Data/practiceDataClean.csv", 
           row.names = FALSE)
 
+
+#note on 07 march i had to add info for kyra beckman and kayla belles-lee
 team <- read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/practiceBYU/team_info.csv")
 
 totals <- cbind(team[,2:length(team)], totals[-length(totals$Name),])
@@ -49,7 +51,7 @@ totals <- totals[,c("Name", "Age", "Pos", "Ft", "Inches", "Exp", "Games", "Start
 # totals <- totals[-13, ]
 
 write.csv(totals, 
-          "/Users/loganclarke/Documents/WBB Project/Practice Data/practiceBoxScore.csv", 
+          "/Users/loganclarke/WBB R Project/Practice Data/practiceBoxScore.csv", 
           row.names = FALSE)
 
 
