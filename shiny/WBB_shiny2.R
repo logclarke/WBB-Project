@@ -7,100 +7,8 @@ library(shinythemes)
 
 #Make sure to write weekly csv and update the cumulative csv in WBB Shiny prep.Rmd
 
-#Read in dataframes that will be used
-week_15_game_data <- read.csv("dfweek15.csv")
-week_14_game_data <- read.csv("dfweek14.csv")
-week_13_game_data <- read.csv("dfweek13.csv")
-week_12_game_data <- read.csv("dfweek12.csv")
-week_11_game_data <- read.csv("dfweek11.csv")
-week_10_game_data <- read.csv("dfweek10.csv")
-week_9_game_data <- read.csv("dfweek9.csv")
-week_8_game_data <- read.csv("dfweek8.csv")
-week_7_game_data <- read.csv("dfweek7.csv")
-week_6_game_data <- read.csv("dfweek6.csv")
-week_5_game_data <- read.csv("dfweek5.csv")
-week_4_game_data <- read.csv("dfweek4.csv")
-week_3_game_data <- read.csv("dfweek3.csv")
-week_2_game_data <- read.csv("dfweek2.csv")
-week_1_game_data <- read.csv("dfweek1.csv")
-#this next one needs to be updated every single week
-cumulative_game_data <- read.csv("df_cum15.csv")
 
-
-#We need all this data in a single dataset where we can filter by column name. Here we will add
-
-week_15_game_data <- week_15_game_data %>% 
-  mutate(week = "Week 15 Game Data",
-         week_num = 15)
-
-week_14_game_data <- week_14_game_data %>% 
-  mutate(week = "Week 14 Game Data",
-         week_num = 14)
-
-week_13_game_data <- week_13_game_data %>% 
-  mutate(week = "Week 13 Game Data",
-         week_num = 13)
-
-week_12_game_data <- week_12_game_data %>% 
-  mutate(week = "Week 12 Game Data",
-         week_num = 12)
-
-week_11_game_data <- week_11_game_data %>% 
-  mutate(week = "Week 11 Game Data",
-         week_num = 11)
-
-week_10_game_data <- week_10_game_data %>% 
-  mutate(week = "Week 10 Game Data",
-         week_num = 10)
-
-week_9_game_data <- week_9_game_data %>% 
-  mutate(week = "Week 9 Game Data",
-         week_num = 9)
-
-week_8_game_data <- week_8_game_data %>% 
-  mutate(week = "Week 8 Game Data",
-         week_num = 8)
-
-week_7_game_data <- week_7_game_data %>% 
-  mutate(week = "Week 7 Game Data",
-         week_num = 7)
-
-week_6_game_data <- week_6_game_data %>% 
-  mutate(week = "Week 6 Game Data",
-         week_num = 6)
-
-week_5_game_data <- week_5_game_data %>% 
-  mutate(week = "Week 5 Game Data",
-         week_num = 5)
-
-week_4_game_data <- week_4_game_data %>% 
-  mutate(week = "Week 4 Game Data",
-         week_num = 4)
-
-week_3_game_data <- week_3_game_data %>% 
-  mutate(week = "Week 3 Game Data",
-         week_num = 3)
-
-week_2_game_data <- week_2_game_data %>% 
-  mutate(week = "Week 2 Game Data",
-         week_num = 2)
-
-week_1_game_data <- week_1_game_data %>% 
-  mutate(week = "Week 1 Game Data",
-         week_num = 1)
-
-cumulative_game_data <- cumulative_game_data %>% 
-  mutate(week = "Cumulative Game Data",
-         week_num = NA)
-
-
-
-combined <- rbind(week_1_game_data, week_2_game_data, week_3_game_data, week_4_game_data, week_5_game_data, 
-                  week_6_game_data, week_7_game_data, week_8_game_data, week_9_game_data, 
-                  week_10_game_data, week_11_game_data, week_12_game_data, week_13_game_data,
-                  week_14_game_data, week_15_game_data, cumulative_game_data)
-
-combined$Name[combined$Name == "Paisley Johnson"] <- "Paisley Harding"
+combined <- read.csv("combined16.csv")
 
 
 ##Section 2 ____________________________________________________
@@ -193,10 +101,76 @@ ui <- navbarPage("Women's Basketball Player Comparison", theme = shinytheme("dar
                             mainPanel(
                               plotOutput("plot1"), #put plot item in main area
                               tableOutput("player_table")
+                            ),
+                            fluidRow(
+                              tags$b("Week Info", style = "font-size:25px"),
+                              br(),
+                              tags$ul(
+                                tags$li("Week 1 (07 November - 13 November): Home vs Lipscomb and 
+                                        home vs Fresno State", 
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 2 (14 November - 20 November): Home vs Arizona State and 
+                                        home vs Boise State",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 3 (21 November - 27 November): Home vs Utah State, 
+                                        neutral vs Florida State, and neutral vs West Virginia",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 4 (28 November - 04 December): Road at Utah",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 5 (05 December - 11 December): Road at Oklahoma",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 6 (12 December - 18 December): Home vs Washington State",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 7 (19 December - 25 December): Road at Montana State",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 8 (02 January - 08 January): Road at San Francisco and 
+                                        home vs Pacific",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 9 (09 January - 15 January): Home vs St. Mary's and 
+                                        road at Loyola Marymount",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 10 (16 January - 22 January): Road at San Diego",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 11 (23 January - 29 January): Home vs San Deigo,
+                                         home vs Santa Clara, and home vs San Francisco",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 12 (30 January - 05 February): Road at Portland and 
+                                        road at Gonzaga",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 13 (06 February - 12 February): Home vs Pepperdine and 
+                                        road at St. Mary's",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 14 (13 February - 19 February): Home vs Loyola Marymount and 
+                                        home vs Gonzaga",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Week 15 (20 February - 26 February): Road at Santa Clara and 
+                                        road at Pacific",
+                                        style = "font-size:17px"
+                                ),
+                                tags$li("Conference Tournament (06 March - 12 March): Neutral vs Portland and 
+                                        neutral vs Gonzaga",
+                                        style = "font-size:17px"
+                                )
+                              ),
+                              br(),
                             )
                           ) 
                  ),
-                 
+                
                  #tab with the season trend charts
                  tabPanel("Season Trends", 
                           
@@ -351,9 +325,9 @@ server = shinyServer(function(input, output) {
     
     team_avg <- mean(data_available$BPM_Pred)
     
-    ovr_undr1 <- ifelse(bpm1 >= 0, bpm1- team_avg, - (team_avg - bpm1))
+    ovr_undr1 <- ifelse(bpm1 >= 0, bpm1 - team_avg, - (team_avg - bpm1))
     
-    ovr_undr2 <- ifelse(bpm2 >= 0, bpm2- team_avg, - (team_avg - bpm2))
+    ovr_undr2 <- ifelse(bpm2 >= 0, bpm2 - team_avg, - (team_avg - bpm2))
     
     stats <- bind_cols("Name" = c(input$player1, input$player2), 
                        "Box Plus Minus" = c(bpm1, bpm2), 
@@ -383,9 +357,9 @@ server = shinyServer(function(input, output) {
             legend.text = element_text(size = 14),
             legend.title = element_text(size = 15)) +
       #need to update the x each week
-      scale_x_continuous(breaks = seq(1, 15, 1)) +
+      scale_x_continuous(breaks = seq(1, 16, 1)) +
       scale_y_continuous(breaks = seq(round(min(combined$BPM_Pred)), round(max(combined$BPM_Pred)), 2)) +
-      scale_color_manual(values=c('navy','royalblue1'))
+      scale_color_manual(values = c('mediumblue','red3'))
   }) 
   
   output$player_table2 <- renderTable({
