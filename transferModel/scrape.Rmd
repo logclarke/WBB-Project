@@ -1,0 +1,239 @@
+---
+title: "Player Scrape"
+author: "Logan Clarke"
+date: "3/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Steps:
+
+1. Gather all the team ids
+2. Set up a for loop. For each iteration (team id), it will open the link
+3. Scrape both tables from each team
+4. rbind all the players and teams into a table
+5. join the tables by team name
+6. get rid of rows with team name (if applicable)
+7. rearrange columns if necessary to match model
+8. run the model for each row in the dataframe and save it as a new column
+9. filter this dataframe based on which players are included in the transfer portal
+10. filter that dataframe based on any credentials from Melanie
+
+
+Scraping the links
+```{r}
+library(rvest)
+#url information
+url <- "https://www.espn.com/womens-college-basketball/teams"
+all_teams_code <- read_html(URL)
+
+#these are the links of the different teams - second argument found with inspector gadget
+links <- html_nodes(all_teams_code, '.n9:nth-child(1) .AnchorLink') %>% 
+  html_attr("href")
+
+links1 <- paste0("https://www.espn.com", links)
+
+links1[1]
+
+
+#this gets the url for everything in the list
+all_urls <- lapply(links1, read_html)
+
+```
+
+
+
+Function to extract every single table
+
+```{r}
+table_func <- function(link){
+  #read in the link
+  html <- read_html(link)
+  
+  #extract the link
+  extracted_tables <- html_nodes(html, '.remove_capitalize') %>% 
+    html_table(fill = T)
+  
+  #this is the first table on the page
+  table_1 <- extracted_tables[1]
+  
+  #change it into a dataframe from a list
+  table_1a <- data.frame(table_1)
+  
+  #it pasted the stats below the names. We want to find the total row, split the dataframe in two at that point, and then bind the two dataframes together
+  which(grepl("Total", table_1a$Name))
+  
+  split_tables <- split(table_1a, cumsum(1:nrow(table_1a) %in% which(grepl("Total", table_1a$Name))))
+  
+  #let's clean up the name table
+  names <- data.frame(split_tables[1]) %>% 
+    mutate(Name = X0.Name) %>% 
+    select(Name)
+  
+  #Cleaning up the stats table: getting rid of the blank total row, setting the new first row to be column names, and then deleting the total row at the bottom
+  stats <- data.frame(split_tables[2])[-1,] %>% 
+    row_to_names(row_number = 1) %>% 
+    slice(1:(n() - 1))
+  
+  #now that the two tables are the same length, we can bind them together
+  both_tables <- cbind(names, stats)
+  
+  #now to repeat the process with the second table!
+  
+  #this is the first table on the page
+  table_2 <- extracted_tables[2]
+  
+  #change it into a dataframe from a list
+  table_2a <- data.frame(table_2)
+  
+  #it pasted the stats below the names. We want to find the total row, split the dataframe in two at that point, and then bind the two dataframes together
+  which(grepl("Total", table_2a$Name))
+  
+  split_tables2 <- split(table_2a,cumsum(1:nrow(table_2a) %in% which(grepl("Total", table_2a$Name))))
+  
+  #let's clean up the name table
+  names2 <- data.frame(split_tables2[1]) %>% 
+    mutate(Name = X0.Name) %>% 
+    select(Name)
+  
+  #Cleaning up the stats table: getting rid of the blank total row, setting the new first row to be column names, and then deleting the total row at the bottom
+  stats2 <- data.frame(split_tables2[2])[-1,] %>% 
+    row_to_names(row_number = 1) %>% 
+    slice(1:(n() - 1))
+  
+  #now that the two tables are the same length, we can bind them together
+  both_tables2 <- cbind(names2, stats2)
+  
+  
+  #Let's clean up the names on them
+  
+  names(both_tables) <- c("Name", "GP", "MPG", "PPG", "REBPG", "ASTPG", "STLPG", "BLKPG", "TOPG", "FG%", "FT%", "3P%")
+  
+  names(both_tables2) <- c("Name", "TMIN", "FGM", "FGA", "FTM", "FTA", "3PM", "3PA", "PTS", "OR", "DR", "TREB", "AST",
+                           "TO", "STL", "BLK")
+  
+  
+  #now join the two tables together on name
+  all_tables <- both_tables %>% 
+    full_join(both_tables2)
+  
+  return(all_tables)
+}
+
+table_func(links1[17])
+
+
+
+```
+
+
+Apply the function to the list of links
+
+```{r}
+tables_list <- lapply(links1, table_func)
+```
+
+
+Comnbine all the dataframes into one big guy
+
+```{r}
+library(tidyverse)
+full_data <- bind_rows(tables_list, .id = "column_label") %>% 
+  select(-column_label)
+
+write_csv(full_data, "full_stats.csv")
+```
+
+
+
+Appendix - previous attempts
+
+Scraping the tables from one link and combining them into one table
+```{r}
+
+#attempt 1 at collecting the tables
+tables1 <- html_nodes(all_urls[1], '.remove_capitalize') %>% 
+  html_table(fill = TRUE)
+
+#attempt 2 of collecting the tables
+table2s <- url1 %>% 
+  html_node("table") %>% 
+  html_table(fill = TRUE)
+
+#let's simplify and try with just one url
+
+bellarmine_link <- links1[1]
+
+bell_html <- read_html(bellarmine_link)
+
+bell_tables <- html_nodes(bell_html, '.remove_capitalize') %>% 
+  html_table(fill = T)
+
+#this is the first table on the page
+bell_1 <- bell_tables[1]
+
+#change it into a dataframe from a list
+bell_1a <- data.frame(bell_1)
+
+#it pasted the stats below the names. We want to find the total row, split the dataframe in two at that point, and then bind the two dataframes together
+which(grepl("Total", bell_1a$Name))
+
+split_tables <- split(bell_1a,cumsum(1:nrow(bell_1a)%in%which(grepl("Total", bell_1a$Name))))
+
+#let's clean up the name table
+names <- data.frame(split_tables[1]) %>% 
+  mutate(Name = X0.Name) %>% 
+  select(Name)
+
+#Cleaning up the stats table: getting rid of the blank total row, setting the new first row to be column names, and then deleting the total row at the bottom
+library(janitor)
+stats <- data.frame(split_tables[2])[-1,] %>% 
+  row_to_names(row_number = 1) %>% 
+  slice(1:(n() - 1))
+
+#now that the two tables are the same length, we can bind them together
+both_tables <- cbind(names, stats)
+
+#now to repeat the process with the second table!
+
+#this is the first table on the page
+bell_2 <- bell_tables[2]
+
+#change it into a dataframe from a list
+bell_2a <- data.frame(bell_2)
+
+#it pasted the stats below the names. We want to find the total row, split the dataframe in two at that point, and then bind the two dataframes together
+which(grepl("Total", bell_2a$Name))
+
+split_tables2 <- split(bell_2a,cumsum(1:nrow(bell_2a)%in%which(grepl("Total", bell_2a$Name))))
+
+#let's clean up the name table
+names2 <- data.frame(split_tables2[1]) %>% 
+  mutate(Name = X0.Name) %>% 
+  select(Name)
+
+#Cleaning up the stats table: getting rid of the blank total row, setting the new first row to be column names, and then deleting the total row at the bottom
+stats2 <- data.frame(split_tables2[2])[-1,] %>% 
+  row_to_names(row_number = 1) %>% 
+  slice(1:(n() - 1))
+
+#now that the two tables are the same length, we can bind them together
+both_tables2 <- cbind(names2, stats2)
+
+
+#Let's clean up the names on them
+
+names(both_tables) <- c("Name", "GP", "MPG", "PPG", "REBPG", "ASTPG", "STLPG", "BLKPG", "TOPG", "FG%", "FT%", "3P%")
+
+names(both_tables2) <- c("Name", "TMIN", "FGM", "FGA", "FTM", "FTA", "3PM", "3PA", "PTS", "OR", "DR", "TREB", "AST",
+                        "TO", "STL", "BLK")
+
+
+#now join the two tables together on name
+all_tables <- both_tables %>% 
+  full_join(both_tables2)
+
+```
