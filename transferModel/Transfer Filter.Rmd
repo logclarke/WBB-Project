@@ -1,0 +1,91 @@
+---
+title: "Transfer Filter"
+author: "Logan Clarke"
+date: "3/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read in files 
+```{r}
+#player stats
+stats <- read.csv("full_stats.csv")
+
+library(readxl)
+library(tidyverse)
+library(janitor)
+#most recent list of names from the transfer portal
+names <- read_excel(path = here::here("Transfer Portal", "transfer_28_march.xlsx"))
+
+#select just the columns of names
+names <- names %>% 
+  row_to_names(row_number = 1) %>% 
+  select("First Name", "Last Name", "Institution")
+
+#get rid of trailing spaces after first name
+names$`First Name` <-  str_trim(names$`First Name`, side = "right")
+
+#combine first and last name
+names <- names %>% 
+  mutate("Player Name" = paste0(names$`First Name`, " ", names$`Last Name`))
+
+#save the transfer portal names to a vector
+names_to_filter <- names$`Player Name`
+
+#save university to a vector
+names <- names %>% 
+  select("Player Name", "Institution")
+
+#change stats to uppercase name
+stats$Name <- str_to_upper(stats$Name, locale = "en")
+
+#add a column for position
+stats$Position <- str_sub(stats$Name, -1)
+
+#add a column for player name
+stats$`Player Name` <- str_sub(stats$Name, 1, -3)
+
+#reorder the columns
+stats <- stats[, c(29, 28, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                   22, 23, 24, 25, 26, 27)]
+
+#filter for those players in the portal
+filtered_stats <- filter(stats, stats$`Player Name` %in% names_to_filter)
+
+```
+
+Read in model output
+
+```{r}
+model_rankings <- read.csv(here::here("Transfer Portal", "Womens_NCAA_Rankings1.csv"))
+
+#change stats to uppercase name
+model_rankings$Name <- str_to_upper(model_rankings$Name, locale = "en")
+
+#add a column for position
+model_rankings$Position <- str_sub(model_rankings$Name, -1)
+
+#add a column for player name
+model_rankings$`Player Name` <- str_sub(model_rankings$Name, 1, -3)
+
+model_rankings <- model_rankings[, c(6, 5, 3, 4)]
+
+filtered_rankings <- filter(model_rankings, model_rankings$`Player Name` %in% names_to_filter)
+
+
+
+```
+Join the percentile/BPM rankings with the stats table
+
+```{r}
+transfer_table <- filtered_rankings %>% 
+  full_join(filtered_stats, by = c("Player Name", "Position")) %>% 
+  full_join(names, by = "Player Name")
+
+transfer_table %>% 
+  write.csv("Transfer Portal 28 March.csv")
+```
+

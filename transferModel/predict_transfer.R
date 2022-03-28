@@ -6,16 +6,21 @@ transfer %>% View()
 
 library(dplyr)
 
+# transfer_ = transfer %>% mutate(PTS = PPG*GP) %>% mutate(TRB = REBPG*GP) %>% mutate(AST = ASTPG*GP) %>% 
+#   mutate(STL = STLPG*GP) %>% mutate(BLK = BLKPG*GP) %>% mutate(TOV = TOPG*GP) %>% mutate(ORB = OR*GP) %>% 
+#   mutate(DRB = DR*GP) %>% mutate(FG = FGM) %>% mutate(X3P = X3PM) %>% mutate(FT = FTM)
 
-transfer_ = transfer %>% mutate(PTS = PPG*GP) %>% mutate(TRB = REBPG*GP) %>% mutate(AST = ASTPG*GP) %>% 
-  mutate(STL = STLPG*GP) %>% mutate(BLK = BLKPG*GP) %>% mutate(TOV = TOPG*GP) %>% mutate(ORB = OR*GP) %>% 
-  mutate(DRB = DR*GP) %>% mutate(FG = FGM) %>% mutate(X3P = X3PM) %>% mutate(FT = FTM)
+colnames(transfer)
+
+transfer_ = transfer %>% mutate(PTS = PTS) %>% mutate(TRB = TREB) %>% mutate(AST = AST) %>% 
+  mutate(STL = STL) %>% mutate(BLK = BLK) %>% mutate(TOV = TO) %>% mutate(ORB = OR) %>% 
+  mutate(DRB = DR) %>% mutate(FG = FGM) %>% mutate(X3P = X3PM) %>% mutate(FT = FTM)
 
 colnames(transfer_)
 
 
 
-box <- read.csv("CompiledBox.csv")
+box <- read.csv("https://raw.githubusercontent.com/logclarke/WBB-Project/main/CompiledBox.csv")
 
 # Get rid of the big outliers
 plot(box$BPM)
